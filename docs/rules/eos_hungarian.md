@@ -1,62 +1,73 @@
 # eos_hungarian
 
-Identify Hungarian notation in names.
+Identify [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) in names. It is quite common to unecessairly include the "data type" of a variable in it's name. Terraform is not a language that lends itself to that.
 
-## Example
+## Examples
 
 ```hcl
-resource "aws_instance" "str_instance" {
-  # ...
+variable "length_int" {
+  type = number
 }
-```
 
-```
+locals {
+  str_username = "ubuntu"
+}
+
 $ tflint
-1 issue(s) found:
+2 issue(s) found:
 
-Warning: 'str_instance' uses Hungarian notation with 'str' (eos_hungarian)
+Warning: 'length_int' uses Hungarian notation with 'int' (eos_hungarian)
 
-  on config.tf line 1:
-  1: resource "aws_instance" "str_instance" {
+  on main.tf line 1:
+  1: variable "length_int" {
 
 Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
 
+Warning: 'str_username' uses Hungarian notation with 'str' (eos_hungarian)
+
+  on main.tf line 6:
+  6: str_username = "ubuntu"
+
+Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
 ```
 
 ## Why
 
-Hungarian notation (encoding type information in variable names) is generally considered redundant in strongly typed languages or declarative configurations like Terraform where the type is often evident from the context (e.g., `resource "aws_instance"` clearly defines an instance). Avoiding it leads to cleaner and more readable code.
-
-## Configuration
-
-| Name | Default | Description |
-| --- | --- | --- |
-| `level` | `"warning"` | TFLint alert level. |
-| `tags` | `["str", "int", "num", "bool", "list", "lst", "set", "map", "arr", "array"]` | List of Hungarian notation tags to identify. |
-
-```hcl
-rule "eos_hungarian" {
-  enabled = true
-  level = "warning"
-  tags = ["str", "int", "num", "bool", "list", "lst", "set", "map", "arr", "array"]
-}
-```
+Hungarian notation (encoding type information in variable names) is generally redundant in strongly typed languages or declarative configurations like Terraform, where the type is usually obvious from the name of the variable. Avoiding Hungarian notation leads to cleaner, more readable code that is easier to refactor.
 
 ## How To Fix
 
-Rename the block to remove the Hungarian notation.
+Rename the Hungarian component of the variable name.
 
 ```hcl
-resource "aws_instance" "web" {
-  # ...
+variable "length" {
+  type = number
+}
+
+locals {
+  username = "ubuntu"
 }
 ```
 
 The rule can be ignored with:
 
 ```hcl
-# tflint-ignore: eos_hungarian
-resource "aws_instance" "str_instance" {
-  # ...
+locals {
+  # tflint-ignore: eos_hungarian
+  username = "ubuntu"
+}
+
+```
+
+## Configuration
+
+This rule is enabled by default and can be disabled with:
+
+```hcl
+rule "eos_hungarian" {
+  enabled = false
 }
 ```
+
+The `tags` argument accepts a list of prefixes (for example `str`, `int`, `num`, or `bool`) that the rule should treat as Hungarian notation indicators.
+

@@ -11,7 +11,7 @@ Ensures that `count` is only used for dynamic guarding (conditional creation) an
 **Valid:**
 
 ```hcl
-resource "aws_instance" "example" {
+resource "terraform_data" "example" {
   count = var.enabled ? 1 : 0
 }
 ```
@@ -19,21 +19,22 @@ resource "aws_instance" "example" {
 **Invalid:**
 
 ```hcl
-resource "aws_instance" "example" {
+resource "terraform_data" "example" {
   count = var.item_count
 }
 
-resource "aws_instance" "example" {
+resource "terraform_data" "example" {
   count = length(var.items)
 }
 ```
 
 ## Configuration
 
-This rule is enabled by default.
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_meta" {
-  enabled = true
+  enabled = false
 }
 ```
+

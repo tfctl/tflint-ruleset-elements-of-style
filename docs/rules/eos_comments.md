@@ -5,14 +5,16 @@ Identify non-standard comment styles: space after comment marker, maximum line l
 ## Example
 
 ```hcl
-#This is a jammed comment
-//This is also jammed
+resource "terraform_data" "example" {
+  #This is a jammed comment
+  //This is also jammed
 
-/*
-  Block comments are not allowed.
-*/
+  /*
+    Block comments are not allowed.
+  */
 
-# This comment is way too long and exceeds the configured column limit which defaults to 80 characters so it will trigger a warning.
+  # This comment is way too long and exceeds the configured column limit which defaults to 80 characters so it will trigger a warning.
+}
 ```
 
 ```
@@ -50,23 +52,10 @@ Readable comments improve code maintainability. "Jammed" comments (without a spa
 
 ## Configuration
 
-| Name | Default | Description |
-| --- | --- | --- |
-| `block` | `true` | Identify block comments (`/* ... */`). |
-| `column` | `80` | Maximum column for a comment. Set to `0` to disable. |
-| `jammed` | `true` | Identify jammed comments (e.g. `#comment`). |
-| `level` | `"warning"` | TFLint alert level. |
-| `threshold` | `null` | Minimum ratio of comment lines to code lines (0.0 - 1.0). |
-| `url_bypass` | `true` | Allow comments with URLs to exceed the column limit. |
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_comments" {
-  enabled = true
-  block = true
-  column = 80
-  jammed = true
-  level = "warning"
-  threshold = 0.1
-  url_bypass = true
+  enabled = false
 }
 ```

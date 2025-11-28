@@ -7,7 +7,7 @@ Identify repeated values (strings, interpolations, lists, maps, sets, expression
 ## Example
 
 ```hcl
-locals {
+resource "terraform_data" "example" {
   # Literals
   val1 = "some-value"
   val2 = "some-value" # Repeated
@@ -79,10 +79,10 @@ Repeating values can lead to maintenance issues. If a value needs to change, it 
 
 ## Configuration
 
-This rule has no specific configuration.
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_dry" {
-  enabled = true
+  enabled = false
 }
 ```

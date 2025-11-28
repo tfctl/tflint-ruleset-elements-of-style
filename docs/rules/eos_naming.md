@@ -5,7 +5,7 @@ Enforces naming conventions on Terraform blocks and locals. Currently checks for
 ## Example
 
 ```hcl
-resource "aws_instance" "very_long_instance_name" {
+resource "terraform_data" "very_long_instance_name" {
   # ...
 }
 
@@ -21,7 +21,7 @@ $ tflint
 Warning: 'very_long_instance_name' is 22 characters and should not be longer than 16 (eos_naming)
 
   on config.tf line 1:
-  1: resource "aws_instance" "very_long_instance_name" {
+  1: resource "terraform_data" "very_long_instance_name" {
 
 Warning: 'MY_VAR' should not be all uppercase (eos_naming)
 
@@ -40,40 +40,16 @@ Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/mai
 
 ## Configuration
 
-| Name | Default | Description |
-| --- | --- | --- |
-| `level` | `"warning"` | TFLint alert level. |
-| `length` | `{}` | Configuration for the length sub-rule. |
-| `shout` | `{}` | Configuration for the shout sub-rule. |
-
-### Length Sub-rule
-
-| Name | Default | Description |
-| --- | --- | --- |
-| `enable` | `true` | Enable the length check. |
-| `length` | `16` | Maximum length of names. |
-
-### Shout Sub-rule
-
-| Name | Default | Description |
-| --- | --- | --- |
-| `enable` | `true` | Enable the shout check. |
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_naming" {
-  enabled = true
-  level = "warning"
-
-  length = {
-    enable = true
-    length = 16
-  }
-
-  shout = {
-    enable = true
-  }
+  enabled = false
 }
 ```
+
+Use the `length` and `shout` configuration blocks to adjust the maximum
+name length or to disable shouting checks individually.
 
 ## How To Fix
 
@@ -81,7 +57,7 @@ Rename the block to a shorter, more descriptive name, or use snake_case/mixedCas
 
 ```hcl
 # tflint-ignore: eos_naming
-resource "aws_instance" "very_long_instance_name" {
+resource "terraform_data" "very_long_instance_name" {
   # ...
 }
 

@@ -6,7 +6,7 @@ Identify comments containing reminder tags.
 
 ```hcl
 # TODO: Fix this later
-resource "aws_instance" "foo" {
+resource "terraform_data" "foo" {
   # ...
 }
 ```
@@ -30,25 +30,23 @@ Reminders (TODOs, FIXMEs, etc.) in code often get ignored and accumulate over ti
 
 ## Configuration
 
-| Name | Default | Description |
-| --- | --- | --- |
-| `level` | `"warning"` | TFLint alert level. |
-| `tags` | `["BUG", "FIXME", "HACK", "TODO"]` | List of reminder tags to identify. |
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_reminder" {
-  enabled = true
-  level = "warning"
-  tags = ["BUG", "FIXME", "HACK", "TODO"]
+  enabled = false
 }
 ```
+
+Use the `tags` argument to customize which reminder keywords are flagged (the defaults
+include `BUG`, `FIXME`, `HACK`, and `TODO`).
 
 ## How To Fix
 
 Address the reminder and remove the comment, or move the task to an issue tracker.
 
 ```hcl
-resource "aws_instance" "foo" {
+resource "terraform_data" "foo" {
   # ...
 }
 ```
@@ -58,7 +56,7 @@ The rule can be ignored with:
 ```hcl
 # tflint-ignore: eos_reminder
 # TODO: Fix this later
-resource "aws_instance" "foo" {
+resource "terraform_data" "foo" {
   # ...
 }
 ```

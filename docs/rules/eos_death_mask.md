@@ -5,8 +5,8 @@ Identify death masks - blocks of code commented out and left behind after its de
 ## Example
 
 ```hcl
-# resource "aws_s3_bucket" "example" {
-#   bucket = "my-bucket"
+# resource "terraform_data" "example" {
+#   name = "example"
 # }
 ```
 
@@ -17,8 +17,8 @@ $ tflint
 Warning: Avoid commented-out code. (eos_death_mask)
 
   on main.tf line 1:
-   1: # resource "aws_s3_bucket" "example" {
-   2: #   bucket = "my-bucket"
+   1: # resource "terraform_data" "example" {
+   2: #   name = "example"
    3: # }
 
 Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_death_mask.md
@@ -30,10 +30,10 @@ Commented-out code creates confusion and clutter. It is often unclear why the co
 
 ## Configuration
 
-This rule is enabled by default.
+This rule is enabled by default and can be disabled with:
 
 ```hcl
 rule "eos_death_mask" {
-  enabled = true
+  enabled = false
 }
 ```
