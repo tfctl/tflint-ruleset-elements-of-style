@@ -267,5 +267,5 @@ func (r *DryRule) Severity() tflint.Severity {
 
 // Link returns the rule link.
 func (r *DryRule) Link() string {
-	return ""
+	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_dry.md"
 }

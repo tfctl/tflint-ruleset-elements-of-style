@@ -13,19 +13,13 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 )
 
-var deathMaskDeep = flag.Bool("deathMaskDeep", false, "enable deep assert")
-
-func TestDeathMask(t *testing.T) {
+func testCommentsJammedRule(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
 
-	t.Run("Rule", testDeathMaskRule)
-}
-
-func testDeathMaskRule(t *testing.T) {
-	var config deathMaskRuleConfig
-	testhelper.LoadRuleConfig(t, "death_mask", &config)
+	var config commentsRuleConfig
+	testhelper.LoadRuleConfig(t, "comments", &config)
 
 	cases := []struct {
 		Name    string
@@ -33,46 +27,46 @@ func testDeathMaskRule(t *testing.T) {
 		Want    helper.Issues
 	}{
 		{
-			Name: "death_mask",
+			Name: "jammed_comments",
 			Content: func() string {
-				content, _ := os.ReadFile("testdata/death_mask.tf")
+				content, _ := os.ReadFile("testdata/comments_jammed.tf")
 				return string(content)
 			}(),
 			Want: helper.Issues{
 				{
-					Rule:    NewDeathMaskRule(),
-					Message: "Avoid commented-out code.",
+					Rule:    NewCommentsRule(),
+					Message: "Avoid jammed comment ('#Jamm ...').",
 					Range: hcl.Range{
-						Filename: "death_mask.tf",
+						Filename: "comments_jammed.tf",
+						Start:    hcl.Pos{Line: 8, Column: 1},
+						End:      hcl.Pos{Line: 8, Column: 16},
+					},
+				},
+				{
+					Rule:    NewCommentsRule(),
+					Message: "Avoid jammed comment ('##Jam ...').",
+					Range: hcl.Range{
+						Filename: "comments_jammed.tf",
+						Start:    hcl.Pos{Line: 9, Column: 1},
+						End:      hcl.Pos{Line: 9, Column: 17},
+					},
+				},
+				{
+					Rule:    NewCommentsRule(),
+					Message: "Avoid jammed comment ('//Jam ...').",
+					Range: hcl.Range{
+						Filename: "comments_jammed.tf",
 						Start:    hcl.Pos{Line: 10, Column: 1},
-						End:      hcl.Pos{Line: 10, Column: 8},
+						End:      hcl.Pos{Line: 10, Column: 17},
 					},
 				},
 				{
-					Rule:    NewDeathMaskRule(),
-					Message: "Avoid commented-out code.",
+					Rule:    NewCommentsRule(),
+					Message: "Avoid jammed comment ('///Ja ...').",
 					Range: hcl.Range{
-						Filename: "death_mask.tf",
-						Start:    hcl.Pos{Line: 14, Column: 1},
-						End:      hcl.Pos{Line: 16, Column: 4},
-					},
-				},
-				{
-					Rule:    NewDeathMaskRule(),
-					Message: "Avoid commented-out code.",
-					Range: hcl.Range{
-						Filename: "death_mask.tf",
-						Start:    hcl.Pos{Line: 21, Column: 3},
-						End:      hcl.Pos{Line: 21, Column: 10},
-					},
-				},
-				{
-					Rule:    NewDeathMaskRule(),
-					Message: "Avoid commented-out code.",
-					Range: hcl.Range{
-						Filename: "death_mask.tf",
-						Start:    hcl.Pos{Line: 26, Column: 1},
-						End:      hcl.Pos{Line: 29, Column: 4},
+						Filename: "comments_jammed.tf",
+						Start:    hcl.Pos{Line: 11, Column: 1},
+						End:      hcl.Pos{Line: 11, Column: 18},
 					},
 				},
 			},
@@ -80,8 +74,8 @@ func testDeathMaskRule(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"death_mask.tf": tc.Content})
-		rule := NewDeathMaskRule()
+		runner := helper.TestRunner(t, map[string]string{"comments_jammed.tf": tc.Content})
+		rule := NewCommentsRule()
 		rule.Config = config
 
 		if err := rule.Check(runner); err != nil {
@@ -97,7 +91,7 @@ func testDeathMaskRule(t *testing.T) {
 		}
 
 		t.Run(tc.Name, func(t *testing.T) {
-			if *deathMaskDeep {
+			if *commentsDeep {
 				helper.AssertIssues(t, tc.Want, runner.Issues)
 			} else {
 				helper.AssertIssuesWithoutRange(t, tc.Want, runner.Issues)

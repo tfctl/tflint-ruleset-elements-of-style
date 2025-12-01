@@ -17,9 +17,16 @@ import (
 
 var hungarianDeep = flag.Bool("hungarianDeep", false, "enable deep assert")
 
-func TestHungarianRule(t *testing.T) {
-	flag.Parse()
+func TestHungarian(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
+	t.Run("Rule", testHungarianRule)
+	t.Run("Config", testHungarianConfig)
+}
+
+func testHungarianRule(t *testing.T) {
 	var config hungarianRuleConfig
 	testhelper.LoadRuleConfig(t, "hungarian", &config)
 
@@ -138,7 +145,7 @@ func TestHungarianRule(t *testing.T) {
 	}
 }
 
-func TestHungarianConfig(t *testing.T) {
+func testHungarianConfig(t *testing.T) {
 	cases := []struct {
 		Name string
 		Want hungarianRuleConfig

@@ -14,19 +14,19 @@ import (
 
 // checkLength checks if comments exceed the column limit.
 func checkLength(r *CommentsRule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
-	if r.Config.Column > 0 {
+	if r.Config.Length.Column > 0 {
 		trimmedText := strings.TrimRight(text, "\r\n")
 		end := token.Range.Start.Column + len(trimmedText) - 1
 
-		if r.Config.URLBypass {
+		if *r.Config.Length.AllowURL {
 			// Simple URL detection.
 			if strings.Contains(trimmedText, "http://") || strings.Contains(trimmedText, "https://") {
 				return
 			}
 		}
 
-		if end > r.Config.Column {
-			message := fmt.Sprintf("Wrap comment at column %d (currently %d).", r.Config.Column, end)
+		if end > r.Config.Length.Column {
+			message := fmt.Sprintf("Wrap comment at column %d (currently %d).", r.Config.Length.Column, end)
 			if err := runner.EmitIssue(r, message, token.Range); err != nil {
 				logger.Error(err.Error())
 			}

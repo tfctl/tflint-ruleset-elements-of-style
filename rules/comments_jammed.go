@@ -17,12 +17,6 @@ import (
 // https://regex101.com/r/5HRrLc/1
 var jammedCommentParser = regexp.MustCompile(`^\s*(///*|##*|/\*\**)([^\s/#])`)
 
-// jammedConfig represents the configuration for jammed comments.
-type jammedConfig struct {
-	Enabled *bool `hclext:"enabled,optional" hcl:"enabled,optional"`
-	Tails   *bool `hclext:"tails,optional" hcl:"tails,optional"`
-}
-
 // checkJammed checks if comments are jammed (no space after delimiter).
 func checkJammed(r *CommentsRule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
 	enabled := true

@@ -41,35 +41,40 @@ func (r *TypeEchoRule) Check(runner tflint.Runner) error {
 	return rulehelper.WalkBlocks(runner, rulehelper.AllLintableBlocks, r, checkForEcho)
 }
 
-// checkForEcho checks if the type is echoed in the name.
+// checkForEcho checks if a word in type is echoed in the name.
 func checkForEcho(runner tflint.Runner,
 	r *TypeEchoRule, defRange hcl.Range,
 	typ string, name string, synonym string) {
 
-	// logger.Debug(fmt.Sprintf("checking for echo in type='%s' name='%s'", typ, name))
+	// Assume there is no echo.
 	echo := false
 
 	lowerTyp := strings.ToLower(typ)   // aws_s3_bucket
 	lowerName := strings.ToLower(name) // my_bucket
-	splitName := strings.SplitSeq(lowerName, "_-")
 	synonymText := ""
 
+	// For each word in type, see if it exists in name. Note that this is
+	// comparing against the entire name value. The impact of that being a name of
+	// "mys3widget" will match against a type of "aws_s3_bucket" (the "s3" word
+	// exists in the name).
 	for part := range strings.SplitSeq(lowerTyp, "_") {
-		// logger.Debug(fmt.Sprintf("checking if '%s' contains part '%s'", lowerName, part))
 		if strings.Contains(lowerName, part) {
 			echo = true
 			break
 		}
 
+		// Get synonyms for the word.
 		synonyms := r.Config.Synonyms[part]
 		if synonym != "" {
 			synonyms = append(synonyms, synonym)
 		}
 
-		// Check synonyms.
+		// Check synonyms.  This logic is different than above in that synonyms are
+		// checked for on word boundaries. So "aws_s3_bucket" DOES NOT match
+		// "mys3_widget", but would match "my_s3_widget".
+		splitName := strings.SplitSeq(lowerName, "_-")
 		for _, syn := range synonyms {
 			for n := range splitName {
-				// logger.Debug(fmt.Sprintf("checking if synonym '%s' matches name part '%v'", syn, n))
 				if strings.Contains(n, syn) {
 					echo = true
 					synonymText = fmt.Sprintf(" (via synonym '%s')", syn)
@@ -77,6 +82,8 @@ func checkForEcho(runner tflint.Runner,
 				}
 			}
 
+			// Don't bother checking more synonyms because we know we already have a
+			// winner.
 			if echo {
 				break
 			}

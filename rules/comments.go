@@ -13,26 +13,46 @@ import (
 
 // defaultCommentsConfig is the default configuration for the CommentsRule.
 var defaultCommentsConfig = commentsRuleConfig{
-	Block:  true,
-	Column: 80,
-	EOL:    true,
+	Block: true,
+	EOL:   true,
 	Jammed: &jammedConfig{
 		Enabled: func() *bool { b := true; return &b }(),
 		Tails:   func() *bool { b := true; return &b }(),
 	},
-	Level:     "warning",
-	URLBypass: true,
+	Length: &lengthConfig{
+		AllowURL: func() *bool { b := true; return &b }(),
+		Column:   80,
+	},
+	Level: "warning",
 }
 
 // commentsRuleConfig represents the configuration for the CommentsRule.
 type commentsRuleConfig struct {
-	Block     bool          `hclext:"block,optional" hcl:"block,optional"`
-	Column    int           `hclext:"column,optional" hcl:"column,optional"`
-	EOL       bool          `hclext:"eol,optional" hcl:"eol,optional"`
-	Jammed    *jammedConfig `hclext:"jammed,block" hcl:"jammed,block"`
-	Level     string        `hclext:"level,optional" hcl:"level,optional"`
-	Threshold *float64      `hclext:"threshold,optional" hcl:"threshold,optional"`
-	URLBypass bool          `hclext:"url_bypass,optional" hcl:"url_bypass,optional"`
+	// Enable block /* */ comment check.
+	Block bool `hclext:"block,optional" hcl:"block,optional"`
+	// Enable EOL comment check.
+	EOL    bool          `hclext:"eol,optional" hcl:"eol,optional"`
+	Jammed *jammedConfig `hclext:"jammed,block" hcl:"jammed,block"`
+	Length *lengthConfig `hclext:"length,block" hcl:"length,block"`
+	// Issue level.
+	Level string `hclext:"level,optional" hcl:"level,optional"`
+	// Minimum ration threshold of comments to code PER SOURCE FILE.
+	Threshold *float64 `hclext:"threshold,optional" hcl:"threshold,optional"`
+}
+
+// jammedConfig represents the configuration for jammed comments.
+type jammedConfig struct {
+	// Enable jammed comment check.
+	Enabled *bool `hclext:"enabled,optional" hcl:"enabled,optional"`
+	// Enable jammed tails ##, /// check.
+	Tails *bool `hclext:"tails,optional" hcl:"tails,optional"`
+}
+
+type lengthConfig struct {
+	// Allow comments with URL to bust the Column limit.
+	AllowURL *bool `hclext:"allow_url,optional" hcl:"allow_url,optional"`
+	// Maximum allowed column for comments. <=0 >= 99 effectively disable check.
+	Column int `hclext:"column,optional" hcl:"column,optional"`
 }
 
 // CommentsRule checks for comment style.

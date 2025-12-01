@@ -1,6 +1,6 @@
 # eos_hungarian
 
-Identify [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) in names. It is quite common to unecessairly include the "data type" of a variable in it's name. Terraform is not a language that lends itself to that.
+Identify [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) in names. It is quite common to unnecessarily include the data type of a variable in it's name. Terraform is not a language that lends itself to that and the type is often times abstracted away.
 
 ## Examples
 
@@ -68,6 +68,17 @@ rule "eos_hungarian" {
   enabled = false
 }
 ```
+
+By default, the following `tags` are considered as Hungarian indicators - 	arr, array, bool, int, list, lst, str, map, num, set. Additional tags can be added in the `.tflint.hcl`:
+
+```hcl
+rule "eos_hungarian" {
+  enabled = false
+  tags = ["foo", "bar"]
+}
+```
+
+
 
 The `tags` argument accepts a list of prefixes (for example `str`, `int`, `num`, or `bool`) that the rule should treat as Hungarian notation indicators.
 

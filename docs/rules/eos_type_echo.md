@@ -1,47 +1,52 @@
 # eos_type_echo
 
-Identify type echoing in names.
+Similar to Hungarian notation, type echoing, or jittering, is the practice of repeating parts of the block type in it's name. Terraform is already a quite verbose language.  Type echoing add no value as the full type and name are *always* presented adjacent to each other:
 
-## Example
+## Examples
 
 ```hcl
-resource "terraform_data" "terraform_data_logging" {
-  # ...
+resource "aws_s3_bucket" "log_bucket" {
 }
 
-```
+resource "aws_security_group" "inbound_group" {
+}
 
-```
 $ tflint
-1 issue(s) found:
+2 issue(s) found:
 
-Warning: The type "terraform_data" is echoed in the label "terraform_data_logging" (eos_type_echo)
+Warning: The type "aws_s3_bucket" is echoed in the label "log_bucket" (eos_type_echo)
 
-  on config.tf line 1:
-  1: resource "terraform_data" "terraform_data_logging" {
+  on main.tf line 1:
+  1: resource "aws_s3_bucket" "log_bucket" {
 
 Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 
+Warning: The type "aws_secuirty_group" is echoed in the label "inbound_group" (eos_type_echo)
+
+  on main.tf line 1:
+  1: resource "aws_security_group" "inbound_group" {
+
+Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 ```
 
 ## Why
 
-Type echoing (aka. type jittering or, sometimes, [Hungarian Notation](https://en.wikipedia.org/wiki/Hungarian_notation)) is considered a bad practice when writing Terraform.  In *all* cases, the Terraform and OpenTofu tooling displays the type (`terraform_data`) immediately adjacent to the label, or name, (`terraform_data_logging`) of the occurrence.
+Type echoing is considered a bad practice when writing Terraform.  In *all* cases, the Terraform and OpenTofu tooling displays the type (`aws_s3_bucket`) immediately adjacent to the label, or name, (`log_bucket`) of the occurrence.
 
-In the HCL language itself, the syntax is, for example -
+In the HCL language itself, the syntax is, for example:
 
 ```hcl
-resource "terraform_data" "terraform_data_logging" {
+resource "aws_s3_bucket" "log_bucket" {
   # ...
 }
 ```
-not -
+And not:
 
 ```hcl
-resource "terraform_data"
+resource "aws_s3_bucket" {
 # A whole bunch of comments describing
 # what this resource is about
-  "terraform_data_logging" {
+  "log_bucket" {
   # ...
 }
 ```
@@ -49,34 +54,39 @@ resource "terraform_data"
 When listing the contents of a state file (with `terraform state list` or `tfctl sq`), or executing a `plan/apply`, the output is -
 
 ```
-terraform_data.terraform_data_logging
+aws_s3_bucket.logging_bucket
 ```
 
-In *all* cases, you would "jitter" as you pronounced this - "terraform data logging". Neither "flows" as well as simply saying "logging".
+In *all* cases, you would "jitter" as you pronounced this - "s3 bucket logging bucket". Neither "flows" as well as simply saying "logging".
 
 Since HCL is a verbose language this can also quickly spin out of control if you were to write something like -
 
 ```hcl
-resource "terraform_data" "terraform_data_primary_security_group" {
-  # ...
+resource "aws_security_group" "inbound_group" {
 }
 
-resource "terraform_data" "terraform_data_security_group_ingress_rule" {
-  security_group_id = terraform_data.terraform_data_primary_security_group.id
-  # ...
+resource "aws_security_group_ingress_rule" "inbound_group_ingress_rule" {
+  security_group_id = aws_security_group.inbound_group.id
+}
+
+# The output echos, too!
+output "inbound_rule_id_output" {
+  value = aws_security_group_ingress_rule.inbound_security_ingress_rule.id
 }
 ```
 
-It's much more readable and, thus, maintainable to write -
+It's much more readable and, thus, maintainable to write:
 
 ```hcl
-resource "terraform_data" "primary" {
-  # ...
+resource "aws_security_group" "inbound" {
 }
 
-resource "terraform_data" "ingress" {
-  security_group_id = terraform_data.primary.id
-  # ...
+resource "aws_security_group_ingress_rule" "inbound" {
+  security_group_id = aws_security_group.inbound.id
+}
+
+output "inbound_rule" {
+  value = aws_security_group_ingress_rule.inbound.id
 }
 ```
 

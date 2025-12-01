@@ -17,9 +17,16 @@ import (
 
 var reminderDeep = flag.Bool("reminderDeep", false, "enable deep assert")
 
-func TestReminderRule(t *testing.T) {
-	flag.Parse()
+func TestReminder(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
+	t.Run("Rule", testReminderRule)
+	t.Run("Config", testReminderConfig)
+}
+
+func testReminderRule(t *testing.T) {
 	var config reminderRuleConfig
 	testhelper.LoadRuleConfig(t, "reminder", &config)
 
@@ -102,7 +109,7 @@ func TestReminderRule(t *testing.T) {
 	}
 }
 
-func TestReminderConfig(t *testing.T) {
+func testReminderConfig(t *testing.T) {
 	cases := []struct {
 		Name string
 		Want reminderRuleConfig

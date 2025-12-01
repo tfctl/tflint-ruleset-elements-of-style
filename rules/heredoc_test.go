@@ -16,8 +16,16 @@ import (
 
 var heredocDeep = flag.Bool("heredocDeep", false, "enable deep assert")
 
-func TestHeredocRule(t *testing.T) {
-	flag.Parse()
+func TestHeredoc(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+
+	t.Run("Rule", testHeredocRule)
+	t.Run("Config", testHeredocConfig)
+}
+
+func testHeredocRule(t *testing.T) {
 
 	var config heredocRuleConfig
 	testhelper.LoadRuleConfig(t, "heredoc", &config)
@@ -146,7 +154,7 @@ func TestHeredocRule(t *testing.T) {
 	}
 }
 
-func TestHeredocConfig(t *testing.T) {
+func testHeredocConfig(t *testing.T) {
 	cases := []struct {
 		Name string
 		Want heredocRuleConfig

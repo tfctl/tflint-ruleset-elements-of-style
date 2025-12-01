@@ -17,9 +17,16 @@ import (
 
 var typeEchoDeep = flag.Bool("typeEchoDeep", false, "enable deep assert")
 
-func TestTypeEchoRule(t *testing.T) {
-	flag.Parse()
+func TestTypeEcho(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
+	t.Run("Rule", testTypeEchoRule)
+	t.Run("Config", testTypeEchoConfig)
+}
+
+func testTypeEchoRule(t *testing.T) {
 	var config typeEchoRuleConfig
 	testhelper.LoadRuleConfig(t, "type_echo", &config)
 
@@ -138,7 +145,7 @@ func TestTypeEchoRule(t *testing.T) {
 	}
 }
 
-func TestTypeEchoConfig(t *testing.T) {
+func testTypeEchoConfig(t *testing.T) {
 	cases := []struct {
 		Name string
 		Want typeEchoRuleConfig

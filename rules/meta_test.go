@@ -15,9 +15,15 @@ import (
 
 var metaDeep = flag.Bool("metaDeep", false, "enable deep assert")
 
-func TestMetaRule(t *testing.T) {
-	flag.Parse()
+func TestMeta(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 
+	t.Run("Rule", testMetaRule)
+}
+
+func testMetaRule(t *testing.T) {
 	var config metaRuleConfig
 	testhelper.LoadRuleConfig(t, "meta", &config)
 

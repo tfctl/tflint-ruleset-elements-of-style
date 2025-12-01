@@ -1,13 +1,15 @@
 rule "comments" {
   block      = true
-  column     = 80
   eol        = true
   jammed {
     enabled = true
     tails = true
   }
+  length {
+    allow_url = true
+    column     = 80
+  }
   threshold = 0.2
-  url_bypass = true
 }
 
 rule "comments_noblock" {
@@ -20,12 +22,24 @@ rule "comments_nojammed" {
   }
 }
 
-rule "comments_nocolumn" {
-  column = 0
+rule "comments_nolength" {
+  // length {
+  //   column = 999
+  // }
 }
 
-rule "comments_nourlbypass" {
-  url_bypass = false
+rule "comments_nocolumn" {
+  length {
+    allow_url = true
+    column = 0
+  }
+}
+
+rule "comments_nourl" {
+  length {
+    allow_url = false
+    column = 80
+  }
 }
 
 rule "death_mask" {

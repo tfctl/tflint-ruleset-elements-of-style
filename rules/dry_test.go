@@ -16,8 +16,16 @@ import (
 
 var dryDeep = flag.Bool("dryDeep", false, "enable deep assert")
 
-func TestDryRule(t *testing.T) {
-	flag.Parse()
+func TestDry(t *testing.T) {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+
+	t.Run("Rule", testDryRule)
+	t.Run("Config", testDryConfig)
+}
+
+func testDryRule(t *testing.T) {
 
 	var config dryRuleConfig
 	testhelper.LoadRuleConfig(t, "dry", &config)
@@ -128,7 +136,7 @@ func TestDryRule(t *testing.T) {
 	}
 }
 
-func TestDryConfig(t *testing.T) {
+func testDryConfig(t *testing.T) {
 	cases := []struct {
 		Name string
 		Want dryRuleConfig
