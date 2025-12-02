@@ -1,9 +1,13 @@
-.PHONY: default build check install release test
-
+.PHONY: default build check clean install release test
 default: build
 
 build:
 	go build
+
+clean-runs:
+	gh run list --limit 100 --json databaseId,createdAt | \
+		jq -r '.[] | select((.createdAt | fromdateiso8601) < (now - 3 * 24 * 60 * 60)) | .databaseId' | \
+		xargs -n1 echo gh run delete
 
 check:
 	tools/check.sh --all
@@ -22,10 +26,11 @@ release:
 	sed -i 's/\(version = \|Version: \)"[0-9]\+\.[0-9]\+\.[0-9]\+"/\1"$(VERSION)"/' README.md main.go
 	git add README.md main.go
 	git diff --cached --quiet || git commit --no-verify --message "Release version $(VERSION)"
-	git tag v$(VERSION)
+	git tag v$(VERSION) --message "Release version v$(VERSION)"
 	@echo "Successfully bumped to $(VERSION) and created tag v$(VERSION)."
 	@echo "Run 'git push origin main --tags' to publish."
 
-test:
+test: build
 	go test ./... --count 1 -v
+
 

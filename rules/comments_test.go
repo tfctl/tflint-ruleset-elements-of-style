@@ -37,7 +37,7 @@ func testCommentsConfig(t *testing.T) {
 			Want: commentsRuleConfig{
 				Block:     true,
 				EOL:       true,
-				Jammed:    &jammedConfig{Enabled: boolPtr(true), Tails: boolPtr(true)},
+				Jammed:    true,
 				Length:    &lengthConfig{Column: 80, AllowURL: boolPtr(true)},
 				Threshold: floatPtr(0.2),
 			},
@@ -51,7 +51,7 @@ func testCommentsConfig(t *testing.T) {
 		{
 			Name: "comments_nojammed",
 			Want: commentsRuleConfig{
-				Jammed: &jammedConfig{Enabled: boolPtr(false)},
+				Jammed: false,
 			},
 		},
 		{

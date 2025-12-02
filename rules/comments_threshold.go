@@ -69,7 +69,7 @@ func checkThreshold(r *CommentsRule, runner tflint.Runner) error {
 				End:      hcl.Pos{Line: 1, Column: 1},
 			}
 
-			message := fmt.Sprintf("Comments ratio is %.0f percent (threshold %.0f percent)", ratio*100, threshold*100)
+			message := fmt.Sprintf("Comments ratio is %.0f percent (minimum threshold %.0f percent)", ratio*100, threshold*100)
 			if err := runner.EmitIssue(r, message, rng); err != nil {
 				logger.Error(err.Error())
 			}

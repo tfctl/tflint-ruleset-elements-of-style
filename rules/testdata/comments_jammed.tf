@@ -14,7 +14,4 @@
 # Tests that will not emit issues.
 
 # Good comment
-## Good comment
 // Good comment
-/// Good comment
-

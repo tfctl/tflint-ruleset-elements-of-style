@@ -1,10 +1,7 @@
 rule "comments" {
   block      = true
   eol        = true
-  jammed {
-    enabled = true
-    tails = true
-  }
+  jammed = true
   length {
     allow_url = true
     column     = 80
@@ -17,9 +14,7 @@ rule "comments_noblock" {
 }
 
 rule "comments_nojammed" {
-  jammed {
-    enabled = false
-  }
+  jammed = false
 }
 
 rule "comments_nolength" {

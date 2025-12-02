@@ -19,22 +19,7 @@ var jammedCommentParser = regexp.MustCompile(`^\s*(///*|##*|/\*\**)([^\s/#])`)
 
 // checkJammed checks if comments are jammed (no space after delimiter).
 func checkJammed(r *CommentsRule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
-	enabled := true
-	if r.Config.Jammed != nil && r.Config.Jammed.Enabled != nil {
-		enabled = *r.Config.Jammed.Enabled
-	}
-
-	tails := false
-	if r.Config.Jammed != nil && r.Config.Jammed.Tails != nil {
-		tails = *r.Config.Jammed.Tails
-	}
-
-	if !tails {
-		// https://regex101.com/r/GCMXXL/1
-		jammedCommentParser = regexp.MustCompile(`^\s*(//|#|/\*)\S`)
-	}
-
-	if enabled {
+	if r.Config.Jammed {
 		if jammedCommentParser.MatchString(text) {
 			trimmed := strings.TrimSpace(text)
 			rns := []rune(trimmed)

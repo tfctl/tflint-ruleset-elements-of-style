@@ -28,7 +28,7 @@ func testCommentsThresholdRule(t *testing.T) {
 		Want    helper.Issues
 	}{
 		{
-			Name: "threshold_violation",
+			Name: "threshold_fail",
 			Content: func() string {
 				content, _ := os.ReadFile("testdata/comments_threshold.tf")
 				return string(content)
@@ -36,7 +36,7 @@ func testCommentsThresholdRule(t *testing.T) {
 			Want: helper.Issues{
 				{
 					Rule:    NewCommentsRule(),
-					Message: "Comments ratio is 14 percent (threshold 50 percent)",
+					Message: "Comments ratio is 14 percent (minimum threshold 50 percent)",
 					Range: hcl.Range{
 						Filename: "comments_threshold.tf",
 						Start:    hcl.Pos{Line: 1, Column: 1},
@@ -44,6 +44,14 @@ func testCommentsThresholdRule(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			Name: "threshold_good",
+			Content: func() string {
+				content, _ := os.ReadFile("testdata/comments_threshold_good.tf")
+				return string(content)
+			}(),
+			Want: helper.Issues{},
 		},
 	}
 

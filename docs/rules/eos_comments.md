@@ -1,25 +1,37 @@
 # eos_comments
 
-Identify non-standard comment styles: space after comment marker, maximum line length, and no block comments.
+Enforces comment style guidelines: no jammed comments, no block comments, maximum line length, and minimum comment ratio.
+
+## Sub-rules
+
+| Sub-rule | Identifies | Default |
+|----------|------------|---------|
+| `block` | Block comments. | `true` |
+| `eol` | End-of-line comments. | `true` |
+| `jammed` | Comments without space after marker. | `true` |
+| `length` | Comments exceeding line length. | `true, column 80)` |
+| `threshold` | Files with low comment ratio. | `0.0` (disabled) |
 
 ## Example
 
 ```hcl
-resource "terraform_data" "example" {
-  #This is a jammed comment
-  //This is also jammed
+#This is a jammed comment
+//This is also jammed
 
-  /*
-    Block comments are not allowed.
-  */
+/*
+  Block comments are not allowed.
+*/
 
-  # This comment is way too long and exceeds the configured column limit which defaults to 80 characters so it will trigger a warning.
+# This comment is way too long and exceeds the configured column limit which defaults to 80 characters so it will trigger a warning.
+
+resource "aws_instance" "example" {
+  ami = var.ami # EOL comment
 }
 ```
 
 ```
 $ tflint
-4 issue(s) found:
+5 issue(s) found:
 
 Warning: Comment is jammed ('#This ...'). (eos_comments)
 
@@ -43,12 +55,17 @@ Warning: Comment extends beyond column 80 to 126. (eos_comments)
   on main.tf line 8:
    8: # This comment is way too long and exceeds the configured column limit which defaults to 80 characters so it will trigger a warning.
 
+Warning: EOL comments not allowed. (eos_comments)
+
+  on main.tf line 11:
+   11:   ami = var.ami # EOL comment
+
 Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_comments.md
 ```
 
 ## Why
 
-Readable comments improve code maintainability. "Jammed" comments (without a space after the `#` or `//` marker) are harder to read. Nothing disrupts readability more than a comment that disappears off the right side of the editor pane or wraps unnaturally. Block comments (`/* ... */`) are generally discouraged in favor of line comments (`#`) for consistency and better diffs. Enforcing a comment threshold ensures that code is adequately documented.
+Readable comments improve code maintainability. "Jammed" comments (without a space after the `#` or `//` marker) are harder to read. Block comments (`/* ... */`) are generally discouraged in favor of line comments (`#`) for consistency and better diffs. Nothing disrupts readability more than a comment that disappears off the right side of the editor pane or wraps unnaturally. End-of-line comments can clutter code. Enforcing a comment threshold ensures that code is adequately documented.
 
 ## Configuration
 
@@ -57,5 +74,21 @@ This rule is enabled by default and can be disabled with:
 ```hcl
 rule "eos_comments" {
   enabled = false
+}
+```
+
+Configure sub-rules individually:
+
+```hcl
+rule "eos_comments" {
+  block    = false  # Allow block comments
+  eol      = false  # Allow EOL comments
+  jammed   = false  # Allow jammed comments
+  length = {
+    column   = 100  # Set max column to 100
+    allow_url = false  # Don't allow URLs to exceed limit
+  }
+  threshold = 0.1  # Require 10% comment ratio
+  level     = "error"  # Change severity to error
 }
 ```

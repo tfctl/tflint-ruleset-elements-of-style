@@ -13,12 +13,9 @@ import (
 
 // defaultCommentsConfig is the default configuration for the CommentsRule.
 var defaultCommentsConfig = commentsRuleConfig{
-	Block: true,
-	EOL:   true,
-	Jammed: &jammedConfig{
-		Enabled: func() *bool { b := true; return &b }(),
-		Tails:   func() *bool { b := true; return &b }(),
-	},
+	Block:  true,
+	EOL:    true,
+	Jammed: true,
 	Length: &lengthConfig{
 		AllowURL: func() *bool { b := true; return &b }(),
 		Column:   80,
@@ -32,20 +29,12 @@ type commentsRuleConfig struct {
 	Block bool `hclext:"block,optional" hcl:"block,optional"`
 	// Enable EOL comment check.
 	EOL    bool          `hclext:"eol,optional" hcl:"eol,optional"`
-	Jammed *jammedConfig `hclext:"jammed,block" hcl:"jammed,block"`
+	Jammed bool          `hclext:"jammed,optional" hcl:"jammed,optional"`
 	Length *lengthConfig `hclext:"length,block" hcl:"length,block"`
 	// Issue level.
 	Level string `hclext:"level,optional" hcl:"level,optional"`
 	// Minimum ration threshold of comments to code PER SOURCE FILE.
 	Threshold *float64 `hclext:"threshold,optional" hcl:"threshold,optional"`
-}
-
-// jammedConfig represents the configuration for jammed comments.
-type jammedConfig struct {
-	// Enable jammed comment check.
-	Enabled *bool `hclext:"enabled,optional" hcl:"enabled,optional"`
-	// Enable jammed tails ##, /// check.
-	Tails *bool `hclext:"tails,optional" hcl:"tails,optional"`
 }
 
 type lengthConfig struct {
