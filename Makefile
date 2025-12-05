@@ -1,4 +1,4 @@
-.PHONY: default build check clean install release test
+.PHONY: default build check clean install release test tflint
 default: build
 
 build:
@@ -32,5 +32,8 @@ release:
 
 test: build
 	go test ./... --count 1 -v
+
+tflint: install
+	for d in rules/*/testdata; do tflint --chdir $$d; done
 
 

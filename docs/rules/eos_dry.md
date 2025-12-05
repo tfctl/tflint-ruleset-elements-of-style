@@ -1,10 +1,12 @@
 # eos_dry
 
-Identify repeated values (strings, interpolations, lists, maps, sets, expressions) to encourage DRY (Don't Repeat Yourself) principles.
+Identify repeated values (strings, interpolations, lists, maps, sets, expressions) and duplicate resource/data blocks to encourage DRY (Don't Repeat Yourself) principles.
 
 **Note:** Numeric and boolean values are not checked by this rule.
 
 ## Example
+
+### Repeated Values
 
 ```hcl
 resource "terraform_data" "example" {
@@ -38,9 +40,25 @@ resource "terraform_data" "example" {
 }
 ```
 
+### Duplicate Blocks
+
+```hcl
+resource "null_resource" "a" {
+  triggers = {
+    key = "value"
+  }
+}
+
+resource "null_resource" "b" {
+  triggers = {
+    key = "value"
+  } # Duplicate block
+}
+```
+
 ```
 $ tflint
-6 issue(s) found:
+7 issue(s) found:
 
 Warning: Value '"some-value"' is repeated 2 times. (eos_dry)
 
@@ -71,11 +89,18 @@ Warning: Map is repeated 2 times. (eos_dry)
 
   on main.tf line 28:
    28:   expr2 = { for k, v in var.map : k => v }
+
+Warning: Duplicate block found 2 times. (eos_dry)
+
+  on main.tf line 34:
+   34:   resource "null_resource" "b" {
 ```
 
 ## Why
 
 Repeating values can lead to maintenance issues. If a value needs to change, it must be updated in multiple places. Using a local value or variable ensures consistency and easier updates.
+
+Duplicate blocks indicate copy-paste errors or missed refactoring opportunities.
 
 ## Configuration
 
@@ -84,5 +109,13 @@ This rule is enabled by default and can be disabled with:
 ```hcl
 rule "eos_dry" {
   enabled = false
+}
+```
+
+Configure the severity:
+
+```hcl
+rule "eos_dry" {
+  level = "error"  # Change severity to error
 }
 ```
