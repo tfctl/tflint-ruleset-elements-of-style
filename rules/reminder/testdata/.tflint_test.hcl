@@ -1,11 +1,12 @@
 rule "reminder" {
-  tags = ["TODO", "FIXME"]
+  tags = ["TODO"]
 }
 
-rule "reminder_custom_tags" {
-  tags = ["HACK", "BUG"]
+rule "reminder_many_tags" {
+  tags = ["BUG", "FIXME", "HORROR", "TODO"]
 }
 
 rule "reminder_disabled" {
   enabled = false
+  tags = []
 }

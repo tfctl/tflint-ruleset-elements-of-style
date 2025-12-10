@@ -33,19 +33,20 @@ func testReminderConfig(t *testing.T) {
 		{
 			Name: "reminder",
 			Want: reminderRuleConfig{
-				Tags: []string{"TODO", "FIXME"},
+				Tags: []string{"TODO"},
+			},
+		},
+		{
+			Name: "reminder_many_tags",
+			Want: reminderRuleConfig{
+				Tags: []string{"BUG", "FIXME", "HORROR", "TODO"},
 			},
 		},
 		{
 			Name: "reminder_disabled",
 			Want: reminderRuleConfig{
 				Enabled: testhelper.BoolPtr(false),
-			},
-		},
-		{
-			Name: "reminder_custom_tags",
-			Want: reminderRuleConfig{
-				Tags: []string{"HACK", "BUG"},
+				Tags:    []string{},
 			},
 		},
 	}
@@ -64,7 +65,7 @@ func testReminderConfig(t *testing.T) {
 
 func testReminderRule(t *testing.T) {
 	var config reminderRuleConfig
-	testhelper.LoadRuleConfig(t, "reminder", &config)
+	testhelper.LoadRuleConfig(t, "reminder_many_tags", &config)
 
 	cases := []struct {
 		Name    string
@@ -81,6 +82,7 @@ func testReminderRule(t *testing.T) {
 				makeReminderMessage("// TODO Reminder found."),
 				makeReminderMessage("# TODO Reminder found."),
 				makeReminderMessage("# TODO Reminder found."),
+				makeReminderMessage("# HORROR This is so bad."),
 				makeReminderMessage("# FIXME Reminder found."),
 			},
 		},

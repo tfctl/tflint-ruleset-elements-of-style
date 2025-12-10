@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Get the current branch name
+branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+# Check if the branch name is exactly 6 digits
+if [[ "$branch_name" =~ ^[0-9]{6}$ ]]; then
+    echo "Error: Pushing branch '$branch_name'. It's a local working branch."
+    exit 1
+fi

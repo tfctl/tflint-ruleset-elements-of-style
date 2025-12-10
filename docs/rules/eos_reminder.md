@@ -35,11 +35,18 @@ This rule is enabled by default and can be disabled with:
 ```hcl
 rule "eos_reminder" {
   enabled = false
+  tags = []
 }
 ```
 
-Use the `tags` argument to customize which reminder keywords are flagged (the defaults
-include `BUG`, `FIXME`, `HACK`, and `TODO`).
+Use the `tags` argument to customize which reminder keywords are flagged. The default list of tags is empty by design. If you use this rule, you must specify `tags` that are relevant for your team. Even though the rule is enabled, it is effectively a no op unless `tags` are included:
+
+```hcl
+rule "eos_reminder" {
+  enabled = false
+  tags = ["FIXME", "TODO"]
+}
+```
 
 ## How To Fix
 

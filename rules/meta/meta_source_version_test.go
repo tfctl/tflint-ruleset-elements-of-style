@@ -36,6 +36,10 @@ func testMetaSourceVersionRule(t *testing.T) {
 				"https module source should specify a valid archive extension.",
 				"Module from registry should specify version.",
 				"Module from registry should specify version.",
+				"Pessimistic version constraint should specify at least major and minor version.",
+				"Version constraint > or >= should not be used. Use ~> or exact version.",
+				"Version constraint > or >= should not be used. Use ~> or exact version.",
+				"Version constraint > or >= should not be used. Use ~> or exact version.",
 			},
 		},
 	}

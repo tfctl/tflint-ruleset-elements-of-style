@@ -81,8 +81,39 @@ func checkModuleSourceVersion(runner tflint.Runner, r *MetaRule, block *hclsynta
 	}
 
 	if isRegistrySource(source) {
-		if _, exists := block.Body.Attributes["version"]; !exists {
+		versionAttr, exists := block.Body.Attributes["version"]
+		if !exists {
 			r.emitIssue(runner, "Module from registry should specify version.", block.Range())
+			return
+		}
+
+		versionExpr := versionAttr.Expr
+		versionVal, diags := versionExpr.Value(&hcl.EvalContext{})
+		if diags.HasErrors() {
+			return
+		}
+
+		if versionVal.Type() != cty.String {
+			return
+		}
+
+		version := versionVal.AsString()
+		constraints := strings.Split(version, ",")
+		for _, c := range constraints {
+			c = strings.TrimSpace(c)
+			if strings.HasPrefix(c, "~>") {
+				ver := strings.TrimSpace(strings.TrimPrefix(c, "~>"))
+				if !strings.Contains(ver, ".") {
+					r.emitIssue(runner, "Pessimistic version constraint should specify at least major and minor version.", block.Range())
+					return
+				}
+				continue
+			}
+
+			if strings.HasPrefix(c, ">") {
+				r.emitIssue(runner, "Version constraint > or >= should not be used. Use ~> or exact version.", block.Range())
+				return
+			}
 		}
 		return
 	}

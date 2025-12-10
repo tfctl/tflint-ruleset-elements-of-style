@@ -7,7 +7,7 @@ Enforces Terraform meta-argument syntax conventions.
 | Sub-rule | Identifies | Default |
 |----------|------------|---------|
 | `count_guard` | Improper count usage. | `true` |
-| `source_version` | Module sources without required versioning. | `true` |
+| `source_version` | Module sources without required versioning. | `true` (no additional options) |
 
 ### count_guard
 
@@ -83,5 +83,14 @@ rule "eos_meta" {
   source_version = false  # Disable source version checks
   level          = "error"  # Change severity to error
 }
+
 ```
+
+### Source Version Configuration
+
+The `source_version` sub-rule has no additional configuration options beyond a simple
+boolean toggle. It does not accept a configuration block (for example,
+`source_version { ... }` is not supported). To disable source version checks, set
+`source_version = false` in the rule configuration. Use the top-level `level`
+parameter to adjust severity.
 

@@ -15,18 +15,16 @@ locals {
 # #########
 # Tests that will emit issues.
 
-# TEST
 # # Only a conditional 0 : 1 or 1 : 0 is allowed.
-resource "bad" "emit" {
+resource "null_resource" "loop" {
   count = 2
 }
 
-# TEST
 # Only a conditional 0 : 1 or 1 : 0 is allowed.
 # This issue will not be emitted when run via `tflint`. I believe this is
 # because tflint is short-circuiting this because it knows the true condition
 # will be taken. Whereas the go test runner does not.
-resource "terraform_data" "emit1" {
+resource "terraform_data" "no01guard" {
   count = local.prod_bool ? 0 : 2
   input = count.index
 }

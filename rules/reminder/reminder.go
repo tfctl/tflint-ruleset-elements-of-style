@@ -15,12 +15,7 @@ import (
 )
 
 // defaultReminderTags is the default list of tags to check for.
-var defaultReminderTags = []string{
-	"BUG",
-	"FIXME",
-	"HACK",
-	"TODO",
-}
+var defaultReminderTags = []string{}
 
 // defaultReminderConfig is the default configuration for the ReminderRule.
 var defaultReminderConfig = reminderRuleConfig{
@@ -31,7 +26,7 @@ var defaultReminderConfig = reminderRuleConfig{
 // reminderRuleConfig represents the configuration for the ReminderRule.
 type reminderRuleConfig struct {
 	Enabled *bool    `hclext:"enabled,optional" hcl:"enabled,optional"`
-	Tags    []string `hclext:"tags,optional" hcl:"tags,optional"`
+	Tags    []string `hclext:"tags" hcl:"tags"`
 	Level   string   `hclext:"level,optional" hcl:"level,optional"`
 }
 
