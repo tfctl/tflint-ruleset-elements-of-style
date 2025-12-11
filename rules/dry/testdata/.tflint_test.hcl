@@ -9,3 +9,7 @@ rule "dry_disabled" {
 rule "dry_info" {
   level = "info"
 }
+
+rule "dry_threshold" {
+  threshold = 5
+}

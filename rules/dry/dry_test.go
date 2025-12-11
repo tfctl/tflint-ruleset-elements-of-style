@@ -45,6 +45,12 @@ func testDryConfig(t *testing.T) {
 				Level: "info",
 			},
 		},
+		{
+			Name: "dry_threshold",
+			Want: dryRuleConfig{
+				Threshold: 5,
+			},
+		},
 	}
 
 	for _, tc := range cases {
@@ -60,13 +66,11 @@ func testDryConfig(t *testing.T) {
 }
 
 func testDryRule(t *testing.T) {
-	var config dryRuleConfig
-	testhelper.LoadRuleConfig(t, "dry", &config)
-
 	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
+		Name       string
+		ConfigName string
+		Content    string
+		Want       []string
 	}{
 		{
 			Name: "dry",
@@ -87,9 +91,25 @@ func testDryRule(t *testing.T) {
 				"Duplicate block found 3 times.",
 			},
 		},
+		{
+			Name:       "dry_threshold",
+			ConfigName: "dry_threshold",
+			Content: func() string {
+				content, _ := os.ReadFile("./testdata/dry_test.tf")
+				return string(content)
+			}(),
+			Want: []string{},
+		},
 	}
 
 	for _, tc := range cases {
+		var config dryRuleConfig
+		configName := "dry"
+		if tc.ConfigName != "" {
+			configName = tc.ConfigName
+		}
+		testhelper.LoadRuleConfig(t, configName, &config)
+
 		runner := helper.TestRunner(t, map[string]string{"dry_test.tf": tc.Content})
 		rule := NewDryRule()
 		rule.Config = config

@@ -18,13 +18,15 @@ import (
 
 // defaultDryConfig is the default configuration for the DryRule.
 var defaultDryConfig = dryRuleConfig{
-	Level: "warning",
+	Level:     "warning",
+	Threshold: 3,
 }
 
 // dryRuleConfig represents the configuration for the rule.
 type dryRuleConfig struct {
-	Enabled *bool  `hclext:"enabled,optional" hcl:"enabled,optional"`
-	Level   string `hclext:"level,optional" hcl:"level,optional"`
+	Enabled   *bool  `hclext:"enabled,optional" hcl:"enabled,optional"`
+	Level     string `hclext:"level,optional" hcl:"level,optional"`
+	Threshold int    `hclext:"threshold,optional" hcl:"threshold,optional"`
 }
 
 // DryRule checks for repeated interpolations.
@@ -52,8 +54,15 @@ func (r *DryRule) Check(runner tflint.Runner) error {
 		}
 	}
 
+	// Set a floor of 2 for threshold. IT doesn't make sense to use < 2, so this
+	// prevents a misconfiguration.
+	threshold := r.Config.Threshold
+	if threshold < 2 {
+		threshold = 2
+	}
+
 	for name, ranges := range candidates {
-		if len(ranges) > 1 {
+		if len(ranges) >= threshold {
 			sort.Slice(ranges, func(i, j int) bool {
 				return ranges[i].Start.Byte < ranges[j].Start.Byte
 			})
@@ -75,7 +84,7 @@ func (r *DryRule) Check(runner tflint.Runner) error {
 		}
 	}
 
-	if err := r.checkDupe(runner, files); err != nil {
+	if err := r.checkDupe(runner, files, threshold); err != nil {
 		return err
 	}
 
@@ -256,7 +265,7 @@ func NewDryRule() *DryRule {
 }
 
 // checkDupe checks for duplicate resource and data blocks.
-func (r *DryRule) checkDupe(runner tflint.Runner, files map[string]*hcl.File) error {
+func (r *DryRule) checkDupe(runner tflint.Runner, files map[string]*hcl.File, threshold int) error {
 	blockHashes := make(map[string][]hcl.Range)
 
 	for filename, file := range files {
@@ -266,7 +275,7 @@ func (r *DryRule) checkDupe(runner tflint.Runner, files map[string]*hcl.File) er
 	}
 
 	for _, ranges := range blockHashes {
-		if len(ranges) > 1 {
+		if len(ranges) >= threshold {
 			sort.Slice(ranges, func(i, j int) bool {
 				return ranges[i].Start.Byte < ranges[j].Start.Byte
 			})
