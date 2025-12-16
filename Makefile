@@ -7,7 +7,7 @@ build:
 clean-runs:
 	gh run list --limit 100 --json databaseId,createdAt | \
 		jq -r '.[] | select((.createdAt | fromdateiso8601) < (now - 3 * 24 * 60 * 60)) | .databaseId' | \
-		xargs -n1 echo gh run delete
+		xargs -n1 gh run delete
 
 check:
 	tools/check.sh --all
