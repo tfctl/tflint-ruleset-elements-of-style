@@ -97,6 +97,8 @@ resource "terraform_data" "count3" {
 
 variable "good" {
   default = "zakpxy1"
+  empty   = {}
+  empty2  = {}
 }
 
 locals {

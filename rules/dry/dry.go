@@ -158,6 +158,10 @@ func (r *DryRule) walkExpression(expr hclsyntax.Expression, filename string, fil
 			}
 		}
 	case *hclsyntax.ObjectConsExpr:
+		// Skip empty maps {}.
+		if len(t.Items) == 0 {
+			return
+		}
 		if !r.hasCountOrEach(t) {
 			rng := t.Range()
 			if rng.Start.Byte < len(fileBytes) && rng.End.Byte <= len(fileBytes) {
