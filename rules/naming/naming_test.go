@@ -8,11 +8,9 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
 )
-
-var namingDeep = flag.Bool("namingDeep", false, "enable deep assert")
 
 func TestNaming(t *testing.T) {
 	if !flag.Parsed() {
@@ -27,37 +25,34 @@ func TestNaming(t *testing.T) {
 }
 
 func testNamingConfig(t *testing.T) {
-	cases := []struct {
-		Name string
-		Want namingRuleConfig
-	}{
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "naming",
+			Name: "eos_naming",
 			Want: namingRuleConfig{},
 		},
 		{
-			Name: "naming_noshout",
+			Name: "eos_naming_noshout",
 			Want: namingRuleConfig{
-				Shout: testhelper.BoolPtr(false),
+				Shout: rulehelper.BoolPtr(false),
 			},
 		},
 		{
-			Name: "naming_disabled",
+			Name: "eos_naming_disabled",
 			Want: namingRuleConfig{
-				Enabled: testhelper.BoolPtr(false),
+				Enabled: rulehelper.BoolPtr(false),
 			},
 		},
 		{
-			Name: "naming_negative_length",
+			Name: "eos_naming_negative_length",
 			Want: namingRuleConfig{
 				Length: func() *int { v := -5; return &v }(),
 			},
 		},
 		{
-			Name: "naming_type_echo",
+			Name: "eos_naming_type_echo",
 			Want: namingRuleConfig{
 				TypeEcho: &typeEchoConfig{
-					Enabled: testhelper.BoolPtr(true),
+					Enabled: rulehelper.BoolPtr(true),
 					Synonyms: map[string][]string{
 						"aws_instance": {"vm", "box"},
 					},
@@ -65,15 +60,15 @@ func testNamingConfig(t *testing.T) {
 			},
 		},
 		{
-			Name: "naming_type_echo_disabled",
+			Name: "eos_naming_type_echo_disabled",
 			Want: namingRuleConfig{
 				TypeEcho: &typeEchoConfig{
-					Enabled: testhelper.BoolPtr(false),
+					Enabled: rulehelper.BoolPtr(false),
 				},
 			},
 		},
 		{
-			Name: "naming_type_echo_custom",
+			Name: "eos_naming_type_echo_custom",
 			Want: namingRuleConfig{
 				TypeEcho: &typeEchoConfig{
 					Synonyms: map[string][]string{
@@ -84,14 +79,5 @@ func testNamingConfig(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			var got namingRuleConfig
-			testhelper.LoadRuleConfig(t, tc.Name, &got)
-
-			if diff := cmp.Diff(tc.Want, got); diff != "" {
-				t.Errorf("config mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
+	testhelper.ConfigTestRunner(t, namingRuleConfig{}, cases)
 }

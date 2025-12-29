@@ -37,3 +37,11 @@ rule "eos_death_mask" {
   enabled = false
 }
 ```
+
+Configure the severity:
+
+```hcl
+rule "eos_death_mask" {
+  level = "error"  # Change severity to error
+}
+```

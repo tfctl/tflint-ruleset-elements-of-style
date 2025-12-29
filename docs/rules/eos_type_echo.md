@@ -1,6 +1,13 @@
 # eos_type_echo
 
-Similar to Hungarian notation, type echoing, or jittering, is the practice of repeating parts of the block type in it's name. Terraform is already a quite verbose language.  Type echoing add no value as the full type and name are *always* presented adjacent to each other:
+> **Note:** This functionality is now part of the `eos_naming` rule as the
+> `type_echo` sub-rule. See [eos_naming](eos_naming.md) for current
+> configuration options.
+
+Similar to Hungarian notation, type echoing, or jittering, is the practice of
+repeating parts of the block type in its name. Terraform is already a quite
+verbose language. Type echoing adds no value as the full type and name are
+*always* presented adjacent to each other.
 
 ## Examples
 
@@ -31,7 +38,9 @@ Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/mai
 
 ## Why
 
-Type echoing is considered a bad practice when writing Terraform.  In *all* cases, the Terraform and OpenTofu tooling displays the type (`aws_s3_bucket`) immediately adjacent to the label, or name, (`log_bucket`) of the occurrence.
+Type echoing is considered a bad practice when writing Terraform. In *all*
+cases, the Terraform and OpenTofu tooling displays the type (`aws_s3_bucket`)
+immediately adjacent to the label, or name, (`log_bucket`) of the occurrence.
 
 In the HCL language itself, the syntax is, for example:
 
@@ -92,22 +101,38 @@ output "inbound_rule" {
 
 ## Configuration
 
-This rule is enabled by default and can be disabled with:
+This check is enabled by default as part of `eos_naming` and can be disabled
+with:
 
 ```hcl
-rule "eos_type_echo" {
-  enabled = false
+rule "eos_naming" {
+  type_echo {
+    enabled = false
+  }
 }
 ```
 
-Use the `synonyms` map to provide alternate type prefixes, such as `group`, `bucket`, or `variable`, for the rule to recognize.
+Use the `synonyms` map to provide alternate type prefixes for the rule to
+recognize:
+
+```hcl
+rule "eos_naming" {
+  type_echo {
+    synonyms = {
+      bucket = ["container", "store"]
+      group  = ["sg", "secgroup"]
+    }
+  }
+}
+```
 
 ## How To Fix
 
-Rename the resource block to remove the repetitive jitter. The rule can be ignored with -
+Rename the resource block to remove the repetitive jitter. The rule can be
+ignored with:
 
-```tf
-# tflint-ignore: eos_type_echo
+```hcl
+# tflint-ignore: eos_naming
 resource "terraform_data" "terraform_data_logging" {
   # ...
 }

@@ -4,37 +4,21 @@
 package naming
 
 import (
-	"flag"
 	"os"
 	"testing"
 
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func testNamingShoutRule(t *testing.T) {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
+	content, _ := os.ReadFile("./testdata/naming_shout.tf")
+	testContent := string(content)
 
-	var config namingRuleConfig
-	testhelper.LoadRuleConfig(t, "naming", &config)
-
-	// Disable snake rule for shout test
-	snakeDisabled := false
-	config.Snake = &snakeDisabled
-
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "shouted_names",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/naming_shout.tf")
-				return string(content)
-			}(),
+			Name:    "eos_naming_nosnake",
+			Content: testContent,
 			Want: []string{
 				"Avoid SHOUTED names (SHOUT)",
 				"Avoid SHOUTED names (SHOUT🤡)",
@@ -49,15 +33,6 @@ func testNamingShoutRule(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"naming_shout.tf": tc.Content})
-		rule := NewNamingRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewNamingRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "naming_shout.tf")
 }

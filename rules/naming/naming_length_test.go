@@ -4,38 +4,23 @@
 package naming
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"testing"
 
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func testNamingLengthRule(t *testing.T) {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
-
-	var config namingRuleConfig
-	testhelper.LoadRuleConfig(t, "naming", &config)
+	content, _ := os.ReadFile("./testdata/naming_length.tf")
+	testContent := string(content)
 
 	limit := defaultLimit
-	if config.Length != nil {
-		limit = *config.Length
-	}
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "long_names",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/naming_length.tf")
-				return string(content)
-			}(),
+			Name:    "eos_naming",
+			Content: testContent,
 			Want: []string{
 				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
 				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
@@ -50,15 +35,6 @@ func testNamingLengthRule(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"naming_length.tf": tc.Content})
-		rule := NewNamingRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewNamingRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "naming_length.tf")
 }

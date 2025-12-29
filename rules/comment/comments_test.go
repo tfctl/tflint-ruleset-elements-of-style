@@ -8,11 +8,9 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
 )
-
-var commentsDeep = flag.Bool("commentsDeep", false, "enable deep assert")
 
 func TestComments(t *testing.T) {
 	if !flag.Parsed() {
@@ -27,61 +25,53 @@ func TestComments(t *testing.T) {
 	t.Run("Config", testCommentsConfig)
 }
 
+func floatPtr(f float64) *float64 {
+	return &f
+}
+
 func testCommentsConfig(t *testing.T) {
-	cases := []struct {
-		Name string
-		Want commentsRuleConfig
-	}{
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "comments",
+			Name: "eos_comments",
 			Want: commentsRuleConfig{
 				Block:     true,
 				EOL:       true,
 				Jammed:    true,
-				Length:    &lengthConfig{Column: 80, AllowURL: testhelper.BoolPtr(true)},
-				Threshold: testhelper.FloatPtr(0.2),
+				Length:    &lengthConfig{Column: 80, AllowURL: rulehelper.BoolPtr(true)},
+				Threshold: floatPtr(0.2),
 			},
 		},
 		{
-			Name: "comments_noblock",
+			Name: "eos_comments_noblock",
 			Want: commentsRuleConfig{
 				Block: false,
 			},
 		},
 		{
-			Name: "comments_nojammed",
+			Name: "eos_comments_nojammed",
 			Want: commentsRuleConfig{
 				Jammed: false,
 			},
 		},
 		{
-			Name: "comments_nolength",
+			Name: "eos_comments_nolength",
 			Want: commentsRuleConfig{
 				Length: nil,
 			},
 		},
 		{
-			Name: "comments_nocolumn",
+			Name: "eos_comments_nocolumn",
 			Want: commentsRuleConfig{
-				Length: &lengthConfig{Column: 0, AllowURL: testhelper.BoolPtr(true)},
+				Length: &lengthConfig{Column: 0, AllowURL: rulehelper.BoolPtr(true)},
 			},
 		},
 		{
-			Name: "comments_nourl",
+			Name: "eos_comments_nourl",
 			Want: commentsRuleConfig{
-				Length: &lengthConfig{Column: 80, AllowURL: testhelper.BoolPtr(false)},
+				Length: &lengthConfig{Column: 80, AllowURL: rulehelper.BoolPtr(false)},
 			},
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			var got commentsRuleConfig
-			testhelper.LoadRuleConfig(t, tc.Name, &got)
-
-			if diff := cmp.Diff(tc.Want, got); diff != "" {
-				t.Errorf("config mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
+	testhelper.ConfigTestRunner(t, commentsRuleConfig{}, cases)
 }

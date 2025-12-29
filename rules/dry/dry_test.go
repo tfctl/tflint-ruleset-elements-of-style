@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func TestDry(t *testing.T) {
@@ -23,57 +23,37 @@ func TestDry(t *testing.T) {
 }
 
 func testDryConfig(t *testing.T) {
-	cases := []struct {
-		Name string
-		Want dryRuleConfig
-	}{
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "dry",
-			Want: dryRuleConfig{
-				Enabled: testhelper.BoolPtr(true),
-			},
+			Name: "eos_dry",
+			Want: defaultDryConfig,
 		},
 		{
-			Name: "dry_disabled",
-			Want: dryRuleConfig{
-				Enabled: testhelper.BoolPtr(false),
-			},
+			Name: "eos_dry_disabled",
+			Want: func() dryConfig {
+				cfg := defaultDryConfig
+				cfg.Enabled = rulehelper.BoolPtr(false)
+				return cfg
+			}(),
 		},
 		{
-			Name: "dry_info",
-			Want: dryRuleConfig{
-				Level: "info",
-			},
-		},
-		{
-			Name: "dry_threshold",
-			Want: dryRuleConfig{
-				Threshold: 5,
-			},
+			Name: "eos_dry_threshold",
+			Want: func() dryConfig {
+				cfg := defaultDryConfig
+				cfg.Threshold = 5
+				return cfg
+			}(),
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			var got dryRuleConfig
-			testhelper.LoadRuleConfig(t, tc.Name, &got)
+	testhelper.ConfigTestRunner(t, defaultDryConfig, cases)
 
-			if diff := cmp.Diff(tc.Want, got); diff != "" {
-				t.Errorf("config mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
 }
 
 func testDryRule(t *testing.T) {
-	cases := []struct {
-		Name       string
-		ConfigName string
-		Content    string
-		Want       []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "dry",
+			Name: "eos_dry",
 			Content: func() string {
 				content, _ := os.ReadFile("./testdata/dry_test.tf")
 				return string(content)
@@ -92,8 +72,7 @@ func testDryRule(t *testing.T) {
 			},
 		},
 		{
-			Name:       "dry_threshold",
-			ConfigName: "dry_threshold",
+			Name: "eos_dry_threshold",
 			Content: func() string {
 				content, _ := os.ReadFile("./testdata/dry_test.tf")
 				return string(content)
@@ -102,22 +81,6 @@ func testDryRule(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		var config dryRuleConfig
-		configName := "dry"
-		if tc.ConfigName != "" {
-			configName = tc.ConfigName
-		}
-		testhelper.LoadRuleConfig(t, configName, &config)
-
-		runner := helper.TestRunner(t, map[string]string{"dry_test.tf": tc.Content})
-		rule := NewDryRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewDryRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "dry_test.tf")
 }

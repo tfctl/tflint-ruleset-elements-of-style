@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
+
 # THINK This is fragile af. Order dependent.  See comment at bottom.
 # TODO Figure out how to use .tflint.hcl in a test.
 
@@ -36,6 +39,14 @@ resource "aws_instance" "str_hung" {
   ami = "ami-abc123"
 }
 
+output "foo_hung" {
+  value = local.hung_int
+}
+
+output "hung_bar_hung" {
+  value = local.hung_int
+}
+
 # #########
 # Tests that will not emit issues.
 
@@ -49,10 +60,3 @@ resource "aws_instance" "no_hung" {
   ami           = "ami-12345678"
   instance_type = "t2.micro"
 }
-
-
-# Input for hungarian_test.go. Each of the blocks in the first ("emit issues")
-# section has a matching test case in hungarian_test.go. What's more, the order
-# of the blocks here must be synced with the order of the test cases. This is
-# super fragile, but I don't have the will to think of a better way right now.
-# The blocks align with common.go/allLintableBlocks.

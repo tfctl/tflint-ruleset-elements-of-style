@@ -90,3 +90,12 @@ rule "eos_heredoc" {
   enabled = false
 }
 ```
+
+Configure the EOF check and severity:
+
+```hcl
+rule "eos_heredoc" {
+  EOF   = false    # Disable the EOF delimiter check
+  level = "error"  # Change severity to error
+}
+```

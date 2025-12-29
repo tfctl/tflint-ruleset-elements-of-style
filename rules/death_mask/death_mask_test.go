@@ -8,53 +8,76 @@ import (
 	"os"
 	"testing"
 
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
-
-var deathMaskDeep = flag.Bool("deathMaskDeep", false, "enable deep assert")
 
 func TestDeathMask(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
 
+	t.Run("Config", testDeathMaskConfig)
 	t.Run("Rule", testDeathMaskRule)
 }
 
-func testDeathMaskRule(t *testing.T) {
-	var config deathMaskRuleConfig
-	testhelper.LoadRuleConfig(t, "death_mask", &config)
-
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+func testDeathMaskConfig(t *testing.T) {
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "death_mask",
+			Name: "eos_death_mask",
+			Want: defaultDeathMaskConfig,
+		},
+		{
+			Name: "eos_death_mask_disabled",
+			Want: func() deathMaskConfig {
+				cfg := defaultDeathMaskConfig
+				cfg.Enabled = rulehelper.BoolPtr(false)
+				return cfg
+			}(),
+		},
+		{
+			Name: "eos_death_mask_error",
+			Want: func() deathMaskConfig {
+				cfg := defaultDeathMaskConfig
+				cfg.Enabled = rulehelper.BoolPtr(false)
+				cfg.Level = "error"
+				return cfg
+			}(),
+		},
+	}
+
+	testhelper.ConfigTestRunner(t, defaultDeathMaskConfig, cases)
+}
+
+func testDeathMaskRule(t *testing.T) {
+	cases := []testhelper.RuleTestCase{
+		{
+			Name: "eos_death_mask",
 			Content: func() string {
 				content, _ := os.ReadFile("./testdata/death_mask.tf")
 				return string(content)
 			}(),
-			Want: []string{
-				AvoidDeathMaskMessage,
-				AvoidDeathMaskMessage,
-				AvoidDeathMaskMessage,
-				AvoidDeathMaskMessage,
-			},
+			Want: FillWantMessages(4, AvoidDeathMaskMessage),
+		},
+		{
+			Name: "eos_death_mask_disabled",
+			Content: func() string {
+				content, _ := os.ReadFile("./testdata/death_mask.tf")
+				return string(content)
+			}(),
+			Want: []string{},
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"death_mask.tf": tc.Content})
-		rule := NewDeathMaskRule()
-		rule.Config = config
+	ruleFactory := func() tflint.Rule { return NewDeathMaskRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "death_mask.tf")
+}
 
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
+func FillWantMessages(count int, message string) []string {
+	want := make([]string, count)
+	for i := range count {
+		want[i] = message
 	}
+	return want
 }

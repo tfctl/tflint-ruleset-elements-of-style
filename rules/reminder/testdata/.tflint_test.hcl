@@ -1,12 +1,16 @@
-rule "reminder" {
-  tags = ["TODO"]
-}
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
 
-rule "reminder_many_tags" {
-  tags = ["BUG", "FIXME", "HORROR", "TODO"]
-}
+rule "eos_reminder" {}
 
-rule "reminder_disabled" {
+rule "eos_reminder_disabled" {
   enabled = false
-  tags = []
+}
+
+rule "eos_reminder_extras" {
+  extras = ["NOTGOOD", "REALBAD"]
+}
+
+rule "eos_reminder_many_tags" {
+  tags = ["BUG", "FIXME", "HORROR", "TODO"]
 }

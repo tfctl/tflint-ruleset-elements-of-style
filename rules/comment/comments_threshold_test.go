@@ -4,58 +4,32 @@
 package comment
 
 import (
-	"flag"
 	"os"
 	"testing"
 
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func testCommentsThresholdRule(t *testing.T) {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
+	thresholdContent, _ := os.ReadFile("./testdata/comments_threshold.tf")
+	goodContent, _ := os.ReadFile("./testdata/comments_threshold_good.tf")
 
-	var config commentsRuleConfig
-	testhelper.LoadRuleConfig(t, "comments", &config)
-
-	threshold := 0.5
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "threshold_fail",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/comments_threshold.tf")
-				return string(content)
-			}(),
+			Name:    "eos_comments_threshold_fail",
+			Content: string(thresholdContent),
 			Want: []string{
-				"Comments ratio is 14 percent (minimum threshold 50 percent)",
+				"Comments ratio is 33 percent (minimum threshold 50 percent)",
 			},
 		},
 		{
-			Name: "threshold_good",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/comments_threshold_good.tf")
-				return string(content)
-			}(),
-			Want: []string{},
+			Name:    "eos_comments_threshold_good",
+			Content: string(goodContent),
+			Want:    []string{},
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"comments_threshold.tf": tc.Content})
-		rule := NewCommentsRule()
-		rule.Config = config
-		rule.Config.Threshold = &threshold
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewCommentsRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "comments_threshold.tf")
 }

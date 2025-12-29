@@ -16,34 +16,46 @@ import (
 const AvoidEOFHeredocMessage = "Avoid using 'EOF' as the heredoc delimiter."
 const AvoidStandardHeredocMessage = "Avoid standard heredoc (<<). Use indented (<<-) instead."
 
-// defaultHeredocConfig is the default configuration for the HeredocRule.
-var defaultHeredocConfig = heredocRuleConfig{
-	EOF:   true,
-	Level: "warning",
-}
-
 // heredocPattern is a regex to match heredoc delimiters.
 var heredocPattern = regexp.MustCompile(`<<(-?)([a-zA-Z0-9]+)\s*$`)
 
-// heredocRuleConfig represents the configuration for the HeredocRule.
-type heredocRuleConfig struct {
+// heredocConfig represents the configuration for the HeredocRule.
+type heredocConfig struct {
 	Enabled *bool  `hclext:"enabled,optional" hcl:"enabled,optional"`
 	EOF     bool   `hclext:"EOF,optional" hcl:"EOF,optional"`
 	Level   string `hclext:"level,optional" hcl:"level,optional"`
 }
 
+// defaultHeredocConfig is the default configuration for the HeredocRule.
+var defaultHeredocConfig = heredocConfig{
+	EOF:   true,
+	Level: "warning",
+}
+
 // HeredocRule checks for standard heredoc usage.
 type HeredocRule struct {
 	tflint.DefaultRule
-	Config heredocRuleConfig
+	Config heredocConfig
+	// RuleName is the rule block name to load from the config file. If empty,
+	// defaults to "eos_heredoc".
+	RuleName string
+	// ConfigFile is the path to the config file. If empty, LoadRuleConfig will
+	// search CWD then $HOME for .tflint.hcl.
+	ConfigFile string
 }
 
 // Check checks whether the rule conditions are met.
 func (r *HeredocRule) Check(runner tflint.Runner) error {
-	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
+	// Load config using the rule name and optional config file path.
+	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
 	}
 
+	// Bail out early if the rule is not enabled. This will occur if the EOS
+	// plugin is enabled, but this specific rule is not.
+	if !r.Enabled() {
+		return nil
+	}
 	return rulehelper.WalkTokens(runner, r, checkHeredocToken)
 }
 
@@ -84,7 +96,7 @@ func NewHeredocRule() *HeredocRule {
 
 // Enabled returns whether the rule is enabled by default.
 func (r *HeredocRule) Enabled() bool {
-	return true
+	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule link.
@@ -94,6 +106,9 @@ func (r *HeredocRule) Link() string {
 
 // Name returns the rule name.
 func (r *HeredocRule) Name() string {
+	if r.RuleName != "" {
+		return r.RuleName
+	}
 	return "eos_heredoc"
 }
 

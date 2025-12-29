@@ -81,14 +81,14 @@ Configure sub-rules individually:
 
 ```hcl
 rule "eos_comments" {
-  block    = false  # Allow block comments
-  eol      = false  # Allow EOL comments
-  jammed   = false  # Allow jammed comments
-  length = {
-    column   = 100  # Set max column to 100
+  block   = false  # Allow block comments
+  eol     = false  # Allow EOL comments
+  jammed  = false  # Allow jammed comments
+  length {
+    column    = 100    # Set max column to 100
     allow_url = false  # Don't allow URLs to exceed limit
   }
-  threshold = 0.1  # Require 10% comment ratio
+  threshold = 0.1    # Require 10% comment ratio
   level     = "error"  # Change severity to error
 }
 ```

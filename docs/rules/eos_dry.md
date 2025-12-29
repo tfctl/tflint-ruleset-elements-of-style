@@ -112,10 +112,12 @@ rule "eos_dry" {
 }
 ```
 
-Configure the severity:
+Configure the threshold (minimum number of repetitions to trigger a warning) and
+severity:
 
 ```hcl
 rule "eos_dry" {
-  level = "error"  # Change severity to error
+  threshold = 3      # Warn only if repeated 3+ times (default: 2)
+  level     = "error"  # Change severity to error
 }
 ```

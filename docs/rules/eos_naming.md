@@ -1,16 +1,17 @@
 # eos_naming
 
-Enforces naming conventions on Terraform blocks and locals. Checks for excessive length, "shouting" (all-uppercase names), and ensures names are lowercase alphanumeric with underscores only.
+Enforces naming conventions on Terraform blocks and locals. Checks for excessive
+length, "shouting" (all-uppercase names), snake_case enforcement, and type
+echoing.
 
 ## Sub-rules
 
 | Sub-rule | Description | Default |
 |----------|-------------|---------|
-| `length` | Checks that names do not exceed a configurable length limit. | Enabled |
-| `shout` | Checks that names are not all-uppercase (shouting). | Enabled |
-| `camel` | Checks that names consist only of lowercase letters, digits, and underscores. | Disabled |
-
-Note: If both `shout` and `camel` are enabled, only `camel` will be enforced as it is more restrictive.
+| `length` | Checks that names do not exceed a configurable length limit. | `16` |
+| `shout` | Checks that names are not all-uppercase (shouting). | `true` |
+| `snake` | Checks that names consist only of lowercase letters, digits, and underscores. | `true` |
+| `type_echo` | Checks that type names are not echoed in labels. | `true` |
 
 ## Example
 
@@ -26,38 +27,60 @@ variable "MY_VAR" {
 variable "CamelCase" {
   # ...
 }
+
+resource "aws_s3_bucket" "log_bucket" {
+  # ...
+}
 ```
 
 ```
 $ tflint
-3 issue(s) found:
+4 issue(s) found:
 
-Warning: 'very_long_instance_name' is 22 characters and should not be longer than 16 (eos_naming)
+Warning: Avoid names longer than 16 ('very_long_instance_name' is 24). (eos_naming)
 
   on config.tf line 1:
   1: resource "terraform_data" "very_long_instance_name" {
 
-Warning: 'MY_VAR' should not be all uppercase (eos_naming)
+Warning: Avoid SHOUTED names (MY_VAR) (eos_naming)
 
   on config.tf line 5:
   5: variable "MY_VAR" {
 
-Warning: 'CamelCase' must be lowercase alphanumeric and underscores only (eos_naming)
+Warning: Names should be snake_case (CamelCase). (eos_naming)
 
   on config.tf line 9:
   9: variable "CamelCase" {
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md
+Warning: Avoid echoing type "aws_s3_bucket" in label "log_bucket". (eos_naming)
 
+  on config.tf line 13:
+  13: resource "aws_s3_bucket" "log_bucket" {
+
+Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md
 ```
 
 ## Why
 
-**Length**: Long names can make Terraform configurations harder to read and maintain. They can also cause issues with tools like `tfctl` or `terraform` by causing content to be pushed way past the right edge of the terminal. Keeping names concise encourages better naming practices and improves overall code quality.
+**Length**: Long names can make Terraform configurations harder to read and
+maintain. They can also cause issues with tools like `tfctl` or `terraform` by
+causing content to be pushed way past the right edge of the terminal. Keeping
+names concise encourages better naming practices and improves overall code
+quality.
 
-**Shout**: All-uppercase names (shouting) can be harder to read and may imply a significance, such as constants or macros, that doesn't exist. Using snake_case, mixedCase, or lowercase names improves readability and aligns with common naming conventions.
+**Shout**: All-uppercase names (shouting) can be harder to read and may imply a
+significance, such as constants or macros, that doesn't exist. Using snake_case
+improves readability and aligns with common naming conventions.
 
-**Camel**: Names that include uppercase letters, hyphens, spaces, or other special characters can be inconsistent and harder to work with in scripts or automation. Restricting to lowercase alphanumeric and underscores ensures consistency and compatibility.
+**Snake**: Names that include uppercase letters, hyphens, spaces, or other
+special characters can be inconsistent and harder to work with in scripts or
+automation. Restricting to lowercase alphanumeric and underscores ensures
+consistency and compatibility.
+
+**Type Echo**: Repeating parts of the block type in its name (e.g., `bucket` in
+`log_bucket` for `aws_s3_bucket`) is redundant since the type and name are
+always displayed adjacent to each other. This leads to unnecessary verbosity
+like "s3 bucket log bucket".
 
 ## Configuration
 
@@ -69,42 +92,37 @@ rule "eos_naming" {
 }
 ```
 
-Use the `length`, `shout`, and `camel` configuration blocks to adjust settings or disable sub-rules individually.
-
-### Length Configuration
+Configure sub-rules individually using simple values:
 
 ```hcl
 rule "eos_naming" {
-  length {
-    enabled = true
-    limit = 16
-  }
+  length = 24      # Set max name length (default: 16, use -1 to disable)
+  shout  = false   # Disable shout check
+  snake  = false   # Disable snake_case check
+  level  = "error" # Change severity to error
 }
 ```
 
-### Shout Configuration
+### Type Echo Configuration
+
+The `type_echo` sub-rule can be configured with a block to specify synonyms:
 
 ```hcl
 rule "eos_naming" {
-  shout {
-    enabled = true
-  }
-}
-```
-
-### Camel Configuration
-
-```hcl
-rule "eos_naming" {
-  camel {
-    enabled = true
+  type_echo {
+    enabled  = true
+    synonyms = {
+      bucket = ["container", "store"]
+      group  = ["sg", "secgroup"]
+    }
   }
 }
 ```
 
 ## How To Fix
 
-Rename the block to a shorter, more descriptive name, or use snake_case instead of all-uppercase or mixed case. The rule can be ignored with -
+Rename the block to a shorter, more descriptive name, or use snake_case instead
+of all-uppercase or mixed case. The rule can be ignored with:
 
 ```hcl
 # tflint-ignore: eos_naming

@@ -19,13 +19,6 @@ const defaultLimit = 16
 // defaultLength is the default length value.
 var defaultLength = defaultLimit
 
-// defaultConfig is the default configuration for the NamingRule.
-var defaultConfig = namingRuleConfig{
-	Enabled: func() *bool { b := true; return &b }(),
-	Level:   "warning",
-	Length:  &defaultLength,
-}
-
 // typeEchoConfig represents the configuration for type echo checks.
 type typeEchoConfig struct {
 	Enabled  *bool               `hclext:"enabled,optional" hcl:"enabled,optional"`
@@ -43,18 +36,38 @@ type namingRuleConfig struct {
 	TypeEcho *typeEchoConfig `hclext:"type_echo,optional" hcl:"type_echo,block"`
 }
 
+// defaultConfig is the default configuration for the NamingRule.
+var defaultConfig = namingRuleConfig{
+	Enabled: func() *bool { b := true; return &b }(),
+	Level:   "warning",
+	Length:  &defaultLength,
+}
+
 // NamingRule checks whether a block's name is excessively long.
 type NamingRule struct {
 	tflint.DefaultRule
 	Config namingRuleConfig
+	// RuleName is the rule block name to load from the config file. If empty,
+	// defaults to "eos_naming".
+	RuleName string
+	// ConfigFile is the path to the config file. If empty, LoadRuleConfig will
+	// search CWD then $HOME for .tflint.hcl.
+	ConfigFile string
 }
 
 // Check checks whether the rule conditions are met.
 func (rule *NamingRule) Check(runner tflint.Runner) error {
-	if err := runner.DecodeRuleConfig(rule.Name(), &rule.Config); err != nil {
+	// Load config using the rule name and optional config file path.
+	if err := rulehelper.LoadRuleConfig(rule.Name(), &rule.Config, rule.ConfigFile); err != nil {
 		return err
 	}
 	logger.Debug(fmt.Sprintf("rule.Config=%v", rule.Config))
+
+	// Bail out early if the rule is not enabled. This will occur if the EOS
+	// plugin is enabled, but this specific rule is not.
+	if !rule.Enabled() {
+		return nil
+	}
 
 	var checks []func(tflint.Runner, *NamingRule, hcl.Range, string, string, string)
 	length := defaultLimit
@@ -88,22 +101,25 @@ func NewNamingRule() *NamingRule {
 	return rule
 }
 
-// Enabled returns whether the rule is enabled by default
+// Enabled returns whether the rule is enabled by default.
 func (rule *NamingRule) Enabled() bool {
-	return true
+	return rule.Config.Enabled == nil || *rule.Config.Enabled
 }
 
-// Link returns the rule reference link
+// Link returns the rule reference link.
 func (rule *NamingRule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md"
 }
 
 // Name returns the rule name.
 func (rule *NamingRule) Name() string {
+	if rule.RuleName != "" {
+		return rule.RuleName
+	}
 	return "eos_naming"
 }
 
-// Severity returns the rule severity
+// Severity returns the rule severity.
 func (rule *NamingRule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(rule.Config.Level)
 }

@@ -69,12 +69,14 @@ rule "eos_hungarian" {
 }
 ```
 
-By default, the following `tags` are considered as Hungarian indicators - 	arr, array, bool, int, list, lst, str, map, num, set. Additional tags can be added in the `.tflint.hcl`:
+By default, the following `tags` are considered as Hungarian indicators: `arr`,
+`array`, `bool`, `int`, `list`, `lst`, `map`, `num`, `set`, `str`. Additional
+tags can be added in the `.tflint.hcl`:
 
 ```hcl
 rule "eos_hungarian" {
-  enabled = false
-  tags = ["foo", "bar"]
+  tags  = ["foo", "bar"]  # Additional tags to check for
+  level = "error"         # Change severity to error
 }
 ```
 

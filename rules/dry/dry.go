@@ -16,29 +16,50 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-// defaultDryConfig is the default configuration for the DryRule.
-var defaultDryConfig = dryRuleConfig{
-	Level:     "warning",
-	Threshold: 3,
-}
-
-// dryRuleConfig represents the configuration for the rule.
-type dryRuleConfig struct {
+// dryConfig represents the configuration for the DryRule.
+type dryConfig struct {
 	Enabled   *bool  `hclext:"enabled,optional" hcl:"enabled,optional"`
 	Level     string `hclext:"level,optional" hcl:"level,optional"`
 	Threshold int    `hclext:"threshold,optional" hcl:"threshold,optional"`
 }
 
+// defaultDryConfig is the default configuration for the DryRule.
+var defaultDryConfig = dryConfig{
+	Enabled:   rulehelper.BoolPtr(true),
+	Level:     "warning",
+	Threshold: 2,
+}
+
 // DryRule checks for repeated interpolations.
 type DryRule struct {
 	tflint.DefaultRule
-	Config dryRuleConfig
+	Config dryConfig
+	// RuleName is the rule block name to load from the config file. If empty,
+	// defaults to "eos_dry".
+	RuleName string
+	// ConfigFile is the path to the config file. If empty, LoadRuleConfig will
+	// search CWD then $HOME for .tflint.hcl.
+	ConfigFile string
 }
 
 // Check checks whether the rule conditions are met.
 func (r *DryRule) Check(runner tflint.Runner) error {
-	if err := runner.DecodeRuleConfig(r.Name(), &r.Config); err != nil {
+	// Load config using the rule name and optional config file path.
+	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
+	}
+
+	// Bail out early if the rule is not enabled. This will occur if the EOS
+	// plugin is enabled, but this specific rule is not.
+	if !r.Enabled() {
+		return nil
+	}
+
+	// Set a floor of 2 for threshold. It doesn't make sense to use < 2, so this
+	// prevents a misconfiguration.
+	threshold := r.Config.Threshold
+	if threshold < 2 {
+		threshold = 2
 	}
 
 	files, err := runner.GetFiles()
@@ -54,13 +75,6 @@ func (r *DryRule) Check(runner tflint.Runner) error {
 		}
 	}
 
-	// Set a floor of 2 for threshold. IT doesn't make sense to use < 2, so this
-	// prevents a misconfiguration.
-	threshold := r.Config.Threshold
-	if threshold < 2 {
-		threshold = 2
-	}
-
 	for name, ranges := range candidates {
 		if len(ranges) >= threshold {
 			sort.Slice(ranges, func(i, j int) bool {
@@ -74,11 +88,7 @@ func (r *DryRule) Check(runner tflint.Runner) error {
 				msg = fmt.Sprintf("Avoid repeating map %d times.", len(ranges))
 			}
 
-			if err := runner.EmitIssue(
-				r,
-				msg,
-				ranges[0],
-			); err != nil {
+			if err := runner.EmitIssue(r, msg, ranges[0]); err != nil {
 				return err
 			}
 		}
@@ -106,9 +116,9 @@ func (r *DryRule) checkDry(body *hclsyntax.Body, filename string, fileBytes []by
 
 // walkExpression recursively traverses an hclsyntax.Expression tree and
 // collects candidate expression source snippets and their byte ranges into
-// the provided candidates map.
-// THIS FUNCTION IS ALMOST ENTIRELY AI-GENERATED with Gemini 3 Pro, which seems
-// to produce far less slop than some of it's peers.
+// the provided candidates map. THESE FUNCTIONS ARE ALMOST ENTIRELY AI-GENERATED
+// with Gemini 3 Pro, which seems to produce less slop than some of it's peers.
+// Update - not true, slop pervasive.
 func (r *DryRule) walkExpression(expr hclsyntax.Expression, filename string, fileBytes []byte, candidates map[string][]hcl.Range) {
 	// HCL does not provide a generic "GetChildren()" method for expressions.
 	// Instead, each expression type stores its sub-expressions in different
@@ -347,7 +357,7 @@ func (r *DryRule) minimizeSource(source string) string {
 
 // Enabled returns whether the rule is enabled by default.
 func (r *DryRule) Enabled() bool {
-	return true
+	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule link.
@@ -357,6 +367,9 @@ func (r *DryRule) Link() string {
 
 // Name returns the rule name.
 func (r *DryRule) Name() string {
+	if r.RuleName != "" {
+		return r.RuleName
+	}
 	return "eos_dry"
 }
 

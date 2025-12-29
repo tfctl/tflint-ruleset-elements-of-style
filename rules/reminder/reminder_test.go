@@ -9,96 +9,92 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
-
-var reminderDeep = flag.Bool("reminderDeep", false, "enable deep assert")
 
 func TestReminder(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
 
-	t.Run("Rule", testReminderRule)
 	t.Run("Config", testReminderConfig)
+	t.Run("Rule", testReminderRule)
 }
 
 func testReminderConfig(t *testing.T) {
-	cases := []struct {
-		Name string
-		Want reminderRuleConfig
-	}{
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "reminder",
-			Want: reminderRuleConfig{
-				Tags: []string{"TODO"},
-			},
+			Name: "eos_reminder",
+			Want: defaultReminderConfig,
 		},
 		{
-			Name: "reminder_many_tags",
-			Want: reminderRuleConfig{
-				Tags: []string{"BUG", "FIXME", "HORROR", "TODO"},
-			},
+			Name: "eos_reminder_disabled",
+			Want: func() reminderConfig {
+				cfg := defaultReminderConfig
+				cfg.Enabled = rulehelper.BoolPtr(false)
+				return cfg
+			}(),
 		},
 		{
-			Name: "reminder_disabled",
-			Want: reminderRuleConfig{
-				Enabled: testhelper.BoolPtr(false),
-				Tags:    []string{},
-			},
+			Name: "eos_reminder_extras",
+			Want: func() reminderConfig {
+				cfg := defaultReminderConfig
+				cfg.Extras = []string{"NOTGOOD", "REALBAD"}
+				return cfg
+			}(),
+		},
+		{
+			Name: "eos_reminder_many_tags",
+			Want: func() reminderConfig {
+				cfg := defaultReminderConfig
+				cfg.Tags = []string{"BUG", "FIXME", "HORROR", "TODO"}
+				return cfg
+			}(),
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			var got reminderRuleConfig
-			testhelper.LoadRuleConfig(t, tc.Name, &got)
-
-			if diff := cmp.Diff(tc.Want, got); diff != "" {
-				t.Errorf("config mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
+	testhelper.ConfigTestRunner(t, defaultReminderConfig, cases)
 }
 
 func testReminderRule(t *testing.T) {
-	var config reminderRuleConfig
-	testhelper.LoadRuleConfig(t, "reminder_many_tags", &config)
+	content, _ := os.ReadFile("./testdata/reminder_test.tf")
+	testContent := string(content)
 
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	// eos_reminder_many_tags has tags = ["BUG", "FIXME", "HORROR", "TODO"]
+	manyTagsWant := []string{
+		makeReminderMessage("// TODO Reminder found."),
+		makeReminderMessage("# TODO Reminder found."),
+		makeReminderMessage("# TODO Reminder found."),
+		makeReminderMessage("# HORROR This is so bad."),
+		makeReminderMessage("# FIXME Reminder found."),
+	}
+
+	// eos_reminder_extras has default tags (BUG, TODO) plus extras (NOTGOOD, REALBAD)
+	extrasWant := []string{
+		makeReminderMessage("// TODO Reminder found."),
+		makeReminderMessage("# TODO Reminder found."),
+		makeReminderMessage("# TODO Reminder found."),
+		makeReminderMessage("// NOTGOOD This is really not a good idea."),
+		makeReminderMessage("// REALBAD This is a really bad idea."),
+	}
+
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "reminders",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/reminder_test.tf")
-				return string(content)
-			}(),
-			Want: []string{
-				makeReminderMessage("// TODO Reminder found."),
-				makeReminderMessage("# TODO Reminder found."),
-				makeReminderMessage("# TODO Reminder found."),
-				makeReminderMessage("# HORROR This is so bad."),
-				makeReminderMessage("# FIXME Reminder found."),
-			},
+			Name:    "eos_reminder_many_tags",
+			Content: testContent,
+			Want:    manyTagsWant,
+		},
+		{
+			Name:    "eos_reminder_extras",
+			Content: testContent,
+			Want:    extrasWant,
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"reminder_test.tf": tc.Content})
-		rule := NewReminderRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewReminderRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "reminder_test.tf")
 }
 
 func makeReminderMessage(line string) string {

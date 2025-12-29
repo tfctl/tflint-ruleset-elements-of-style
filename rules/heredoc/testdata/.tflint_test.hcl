@@ -1,11 +1,14 @@
-rule "heredoc" {
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
+
+rule "eos_heredoc" {
   EOF = true
 }
 
-rule "heredoc_disabled" {
+rule "eos_heredoc_disabled" {
   enabled = false
 }
 
-rule "heredoc_no_eof" {
+rule "eos_heredoc_no_eof" {
   EOF = false
 }

@@ -4,34 +4,22 @@
 package naming
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"testing"
 
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func testNamingTypeEchoRule(t *testing.T) {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
+	content, _ := os.ReadFile("./testdata/naming_type_echo.tf")
+	testContent := string(content)
 
-	var config namingRuleConfig
-	testhelper.LoadRuleConfig(t, "naming_type_echo", &config)
-
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "echoed_names",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/naming_type_echo.tf")
-				return string(content)
-			}(),
+			Name:    "eos_naming_type_echo",
+			Content: testContent,
 			Want: []string{
 				makeTypeEchoMessage("variable", "variable_echo"),
 				makeTypeEchoMessage("local", "local_echo"),
@@ -45,17 +33,8 @@ func testNamingTypeEchoRule(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"naming_type_echo.tf": tc.Content})
-		rule := NewNamingRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewNamingRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "naming_type_echo.tf")
 }
 
 func makeTypeEchoMessage(typ string, name string) string {

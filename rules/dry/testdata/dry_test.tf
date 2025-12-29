@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
+
 # THINK This is fragile af. Order dependent.  See comment at bottom.
 # TODO Figure out how to use .tflint.hcl in a test.
 

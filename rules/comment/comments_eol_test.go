@@ -4,33 +4,21 @@
 package comment
 
 import (
-	"flag"
 	"os"
 	"testing"
 
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
 func testCommentsEOLRule(t *testing.T) {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
+	content, _ := os.ReadFile("./testdata/comments_eol.tf")
+	testContent := string(content)
 
-	var config commentsRuleConfig
-	testhelper.LoadRuleConfig(t, "comments", &config)
-
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
+	cases := []testhelper.RuleTestCase{
 		{
-			Name: "eol_comments",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/comments_eol.tf")
-				return string(content)
-			}(),
+			Name:    "eos_comments",
+			Content: testContent,
 			Want: []string{
 				avoidEOLCommentsMessage,
 				avoidEOLCommentsMessage,
@@ -41,15 +29,6 @@ func testCommentsEOLRule(t *testing.T) {
 		},
 	}
 
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"comments_eol.tf": tc.Content})
-		rule := NewCommentsRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	ruleFactory := func() tflint.Rule { return NewCommentsRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "comments_eol.tf")
 }

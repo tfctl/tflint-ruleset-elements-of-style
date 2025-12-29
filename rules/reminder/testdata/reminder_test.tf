@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
+
 # #########
 # Tests that will emit issues.
 
@@ -18,6 +21,9 @@ resource "terraform_data" "fixme" { # FIXME Reminder found.
   FIXME
   Reminder found.
 */
+
+// NOTGOOD This is really not a good idea.
+// REALBAD This is a really bad idea.
 
 # #########
 # Tests that will not emit issues.

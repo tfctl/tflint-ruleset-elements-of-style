@@ -9,104 +9,83 @@ import (
 	"os"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
-	"github.com/terraform-linters/tflint-plugin-sdk/helper"
+	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
-
-var hungarianDeep = flag.Bool("hungarianDeep", false, "enable deep assert")
-
-func boolPtr(b bool) *bool {
-	return &b
-}
 
 func TestHungarian(t *testing.T) {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
 
-	t.Run("Rule", testHungarianRule)
 	t.Run("Config", testHungarianConfig)
-}
-
-func testHungarianRule(t *testing.T) {
-	var config hungarianRuleConfig
-	testhelper.LoadRuleConfig(t, "hungarian", &config)
-
-	cases := []struct {
-		Name    string
-		Content string
-		Want    []string
-	}{
-		{
-			Name: "hungarian_names",
-			Content: func() string {
-				content, _ := os.ReadFile("./testdata/hungarian_test.tf")
-				return string(content)
-			}(),
-			Want: []string{
-				makeHungarianMessage("str_hung", "str"),
-				makeHungarianMessage("hung_int", "int"),
-				makeHungarianMessage("hung_bool_check", "bool"),
-				makeHungarianMessage("map_hung", "map"),
-				makeHungarianMessage("hung_lst", "lst"),
-				makeHungarianMessage("hung_set_mod", "set"),
-				makeHungarianMessage("num_hung", "num"),
-				makeHungarianMessage("str_hung", "str"),
-			},
-		},
-	}
-
-	for _, tc := range cases {
-		runner := helper.TestRunner(t, map[string]string{"hungarian_test.tf": tc.Content})
-		rule := NewHungarianRule()
-		rule.Config = config
-
-		if err := rule.Check(runner); err != nil {
-			t.Fatalf("Unexpected error occurred: %s", err)
-		}
-
-		testhelper.AssertIssuesMessages(t, tc.Want, runner.Issues)
-	}
+	t.Run("Rule", testHungarianRule)
 }
 
 func testHungarianConfig(t *testing.T) {
-	cases := []struct {
-		Name string
-		Want hungarianRuleConfig
-	}{
+	cases := []testhelper.ConfigTestCase{
 		{
-			Name: "hungarian",
-			Want: hungarianRuleConfig{
-				Tags: []string{"str", "int", "num", "bool", "list", "lst", "set", "map", "arr", "array"},
-			},
+			Name: "eos_hungarian",
+			Want: defaultHungarianConfig,
+			// Tags: []string{"str", "int", "num", "bool", "list", "lst", "set", "map", "arr", "array"},
 		},
 		{
-			Name: "hungarian_disabled",
-			Want: hungarianRuleConfig{
-				Enabled: boolPtr(false),
-			},
+			Name: "eos_hungarian_disabled",
+			Want: func() hungarianConfig {
+				cfg := defaultHungarianConfig
+				cfg.Enabled = rulehelper.BoolPtr(false)
+				return cfg
+			}(),
 		},
 		{
-			Name: "hungarian_custom_tags",
-			Want: hungarianRuleConfig{
-				Tags: []string{"foo", "bar"},
-			},
+			Name: "eos_hungarian_custom_tags",
+			Want: func() hungarianConfig {
+				cfg := defaultHungarianConfig
+				cfg.Tags = []string{"foo", "bar"}
+				return cfg
+			}(),
 		},
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.Name, func(t *testing.T) {
-			var got hungarianRuleConfig
-			testhelper.LoadRuleConfig(t, tc.Name, &got)
-
-			if diff := cmp.Diff(tc.Want, got); diff != "" {
-				t.Errorf("config mismatch (-want +got):\n%s", diff)
-			}
-		})
-	}
+	testhelper.ConfigTestRunner(t, defaultHungarianConfig, cases)
 }
 
-func makeHungarianMessage(name string, key string) string {
+func testHungarianRule(t *testing.T) {
+	content, _ := os.ReadFile("./testdata/hungarian_test.tf")
+	testContent := string(content)
+
+	baseWant := []string{
+		makeMessage("str_hung", "str"),
+		makeMessage("hung_int", "int"),
+		makeMessage("hung_bool_check", "bool"),
+		makeMessage("map_hung", "map"),
+		makeMessage("hung_lst", "lst"),
+		makeMessage("hung_set_mod", "set"),
+		makeMessage("num_hung", "num"),
+		makeMessage("str_hung", "str"),
+	}
+
+	cases := []testhelper.RuleTestCase{
+		{
+			Name:    "eos_hungarian",
+			Content: testContent,
+			Want:    baseWant,
+		},
+		{
+			Name:    "eos_hungarian_custom_tags",
+			Content: testContent,
+			Want: append(baseWant,
+				makeMessage("foo_hung", "foo"),
+				makeMessage("hung_bar_hung", "bar"),
+			),
+		},
+	}
+
+	ruleFactory := func() tflint.Rule { return NewHungarianRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "hungarian_test.tf")
+}
+
+func makeMessage(name string, key string) string {
 	return fmt.Sprintf("Avoid Hungarian notation '%s' in '%s'.", key, name)
 }

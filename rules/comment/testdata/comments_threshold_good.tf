@@ -1,3 +1,6 @@
+# Copyright (c) 2025 Steve Taranto <staranto@gmail.com>.
+# SPDX-License-Identifier: Apache-2.0
+
 # This example will not emit and issue
 # because there are a ton of comment
 # lines in this source file. Thus there
