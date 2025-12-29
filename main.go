@@ -25,7 +25,7 @@ func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "elements-of-style",
-			Version: "0.2.1",
+			Version: "0.3.0",
 			Rules: []tflint.Rule{
 				comment.NewCommentsRule(),
 				deathmask.NewDeathMaskRule(),
