@@ -32,8 +32,8 @@ var defaultHeredocConfig = heredocConfig{
 	Level: "warning",
 }
 
-// HeredocRule checks for standard heredoc usage.
-type HeredocRule struct {
+// Rule checks for standard heredoc usage.
+type Rule struct {
 	tflint.DefaultRule
 	Config heredocConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -45,7 +45,7 @@ type HeredocRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *HeredocRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -60,7 +60,7 @@ func (r *HeredocRule) Check(runner tflint.Runner) error {
 }
 
 // checkHeredocToken checks for heredoc style violations in a token.
-func checkHeredocToken(runner tflint.Runner, r *HeredocRule, token hclsyntax.Token) {
+func checkHeredocToken(runner tflint.Runner, r *Rule, token hclsyntax.Token) {
 	if token.Type == hclsyntax.TokenOHeredoc {
 		text := string(token.Bytes)
 		if matches := heredocPattern.FindStringSubmatch(text); matches != nil {
@@ -88,24 +88,24 @@ func checkHeredocToken(runner tflint.Runner, r *HeredocRule, token hclsyntax.Tok
 }
 
 // NewHeredocRule returns a new rule.
-func NewHeredocRule() *HeredocRule {
-	rule := &HeredocRule{}
+func NewHeredocRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultHeredocConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *HeredocRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule link.
-func (r *HeredocRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_heredoc.md"
 }
 
 // Name returns the rule name.
-func (r *HeredocRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -113,6 +113,6 @@ func (r *HeredocRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *HeredocRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

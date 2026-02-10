@@ -13,7 +13,7 @@ import (
 )
 
 // checkThreshold checks if the comment ratio is below the threshold.
-func checkThreshold(r *CommentsRule, runner tflint.Runner) error {
+func checkThreshold(r *Rule, runner tflint.Runner) error {
 	if r.Config.Threshold == nil {
 		return nil
 	}

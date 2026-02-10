@@ -17,21 +17,15 @@ func testNamingLengthRule(t *testing.T) {
 	testContent := string(content)
 
 	limit := defaultLimit
+	longNameMsg := fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit)
 	cases := []testhelper.RuleTestCase{
 		{
 			Name:    "eos_naming",
 			Content: testContent,
-			Want: []string{
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
-				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name' is 23).", limit),
+			Want: append(
+				testhelper.MakeMessageList(longNameMsg, 8),
 				fmt.Sprintf("Avoid names longer than %d ('really_a_very_long_name_disabled' is 32).", limit),
-			},
+			),
 		},
 	}
 

@@ -46,8 +46,8 @@ var defaultCommentsConfig = commentsRuleConfig{
 	Level: "warning",
 }
 
-// CommentsRule checks for comment style.
-type CommentsRule struct {
+// Rule checks for comment style.
+type Rule struct {
 	tflint.DefaultRule
 	Config commentsRuleConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -59,7 +59,7 @@ type CommentsRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *CommentsRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -90,8 +90,8 @@ func (r *CommentsRule) Check(runner tflint.Runner) error {
 // previous token for context.
 func checkCommentsWithContext(
 	runner tflint.Runner,
-	rule *CommentsRule,
-	checkFuncs ...func(*CommentsRule, string, tflint.Runner, hclsyntax.Token, *hclsyntax.Token),
+	rule *Rule,
+	checkFuncs ...func(*Rule, string, tflint.Runner, hclsyntax.Token, *hclsyntax.Token),
 ) error {
 	files, err := runner.GetFiles()
 	if err != nil {
@@ -127,25 +127,25 @@ func checkCommentsWithContext(
 }
 
 // NewCommentsRule returns a new rule.
-func NewCommentsRule() *CommentsRule {
-	rule := &CommentsRule{}
+func NewCommentsRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultCommentsConfig
 
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *CommentsRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule link.
-func (r *CommentsRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_comments.md"
 }
 
 // Name returns the rule name.
-func (r *CommentsRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -153,6 +153,6 @@ func (r *CommentsRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *CommentsRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

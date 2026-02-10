@@ -19,17 +19,10 @@ func testNamingShoutRule(t *testing.T) {
 		{
 			Name:    "eos_naming_nosnake",
 			Content: testContent,
-			Want: []string{
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT🤡)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-				"Avoid SHOUTED names (SHOUT)",
-			},
+			Want: testhelper.MakeMessageList(
+				"Avoid SHOUTED names (SHOUT)", 8,
+				"Avoid SHOUTED names (SHOUT🤡)", 1,
+			),
 		},
 	}
 

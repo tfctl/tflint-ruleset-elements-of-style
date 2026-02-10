@@ -30,8 +30,8 @@ var defaultDryConfig = dryConfig{
 	Threshold: 2,
 }
 
-// DryRule checks for repeated interpolations.
-type DryRule struct {
+// Rule checks for repeated interpolations.
+type Rule struct {
 	tflint.DefaultRule
 	Config dryConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -43,7 +43,7 @@ type DryRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *DryRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -102,7 +102,7 @@ func (r *DryRule) Check(runner tflint.Runner) error {
 }
 
 // checkDry recursively checks for repeated expressions in the body.
-func (r *DryRule) checkDry(body *hclsyntax.Body, filename string, fileBytes []byte, candidates map[string][]hcl.Range, isModule bool) {
+func (r *Rule) checkDry(body *hclsyntax.Body, filename string, fileBytes []byte, candidates map[string][]hcl.Range, isModule bool) {
 	for name, attr := range body.Attributes {
 		if isModule && name == "source" {
 			continue
@@ -119,7 +119,7 @@ func (r *DryRule) checkDry(body *hclsyntax.Body, filename string, fileBytes []by
 // the provided candidates map. THESE FUNCTIONS ARE ALMOST ENTIRELY AI-GENERATED
 // with Gemini 3 Pro, which seems to produce less slop than some of it's peers.
 // Update - not true, slop pervasive.
-func (r *DryRule) walkExpression(expr hclsyntax.Expression, filename string, fileBytes []byte, candidates map[string][]hcl.Range) {
+func (r *Rule) walkExpression(expr hclsyntax.Expression, filename string, fileBytes []byte, candidates map[string][]hcl.Range) {
 	// HCL does not provide a generic "GetChildren()" method for expressions.
 	// Instead, each expression type stores its sub-expressions in different
 	// fields. We have to check the type to know which fields to walk
@@ -207,7 +207,7 @@ func (r *DryRule) walkExpression(expr hclsyntax.Expression, filename string, fil
 
 // hasCountOrEach reports whether the given HCL expression contains a scope traversal
 // whose root identifier is "count" or "each".
-func (r *DryRule) hasCountOrEach(expr hclsyntax.Expression) bool {
+func (r *Rule) hasCountOrEach(expr hclsyntax.Expression) bool {
 	found := false
 	var check func(hclsyntax.Expression)
 	check = func(e hclsyntax.Expression) {
@@ -272,14 +272,14 @@ func (r *DryRule) hasCountOrEach(expr hclsyntax.Expression) bool {
 }
 
 // NewDryRule returns a new rule.
-func NewDryRule() *DryRule {
-	rule := &DryRule{}
+func NewDryRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultDryConfig
 	return rule
 }
 
 // checkDupe checks for duplicate resource and data blocks.
-func (r *DryRule) checkDupe(runner tflint.Runner, files map[string]*hcl.File, threshold int) error {
+func (r *Rule) checkDupe(runner tflint.Runner, files map[string]*hcl.File, threshold int) error {
 	blockHashes := make(map[string][]hcl.Range)
 
 	for filename, file := range files {
@@ -305,7 +305,7 @@ func (r *DryRule) checkDupe(runner tflint.Runner, files map[string]*hcl.File, th
 }
 
 // collectBlocks recursively collects resource and data blocks and computes their hashes.
-func (r *DryRule) collectBlocks(body *hclsyntax.Body, filename string, fileBytes []byte, blockHashes map[string][]hcl.Range) {
+func (r *Rule) collectBlocks(body *hclsyntax.Body, filename string, fileBytes []byte, blockHashes map[string][]hcl.Range) {
 	for _, block := range body.Blocks {
 		if block.Type == "resource" || block.Type == "data" {
 			hash := r.hashBlock(block, fileBytes)
@@ -317,7 +317,7 @@ func (r *DryRule) collectBlocks(body *hclsyntax.Body, filename string, fileBytes
 }
 
 // hashBlock normalizes and hashes a block.
-func (r *DryRule) hashBlock(block *hclsyntax.Block, fileBytes []byte) string {
+func (r *Rule) hashBlock(block *hclsyntax.Block, fileBytes []byte) string {
 	// Normalize by sorting attributes
 	sortedAttrs := make([]string, 0, len(block.Body.Attributes))
 	for name := range block.Body.Attributes {
@@ -349,7 +349,7 @@ func (r *DryRule) hashBlock(block *hclsyntax.Block, fileBytes []byte) string {
 }
 
 // minimizeSource removes whitespace from source.
-func (r *DryRule) minimizeSource(source string) string {
+func (r *Rule) minimizeSource(source string) string {
 	var result strings.Builder
 	for _, r := range source {
 		if r != ' ' && r != '\t' && r != '\n' && r != '\r' {
@@ -360,17 +360,17 @@ func (r *DryRule) minimizeSource(source string) string {
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *DryRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule link.
-func (r *DryRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_dry.md"
 }
 
 // Name returns the rule name.
-func (r *DryRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -378,6 +378,6 @@ func (r *DryRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *DryRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

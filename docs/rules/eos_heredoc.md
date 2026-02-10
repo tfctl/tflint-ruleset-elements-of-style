@@ -2,7 +2,7 @@
 
 Identifies usage of standard heredoc syntax (`<<`) and suggest indented heredoc syntax (`<<-`). Also, optionally, identifies usage of "EOF" as a heredoc delimiter.
 
-## Examples
+## Example
 
 ```hcl
 # Bad.

@@ -11,9 +11,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 )
 
 // TestConfigFile is the standard path to the test config file relative to each
@@ -115,6 +116,29 @@ func deepCopy[T any](src T) (T, error) {
 	}
 	err = json.Unmarshal(b, &dst)
 	return dst, err
+}
+
+// MakeMessageList creates a slice of repeated messages. Arguments are provided
+// in pairs: message string followed by count. For example:
+//
+//	MakeMessageList(MsgX, 2)                      // [MsgX, MsgX]
+//	MakeMessageList(MsgX, 3, MsgY, 1, MsgZ, 2)    // [MsgX, MsgX, MsgX, MsgY, MsgZ, MsgZ]
+func MakeMessageList(args ...any) []string {
+	var messages []string
+	for i := 0; i < len(args)-1; i += 2 {
+		message, ok := args[i].(string)
+		if !ok {
+			continue
+		}
+		count, ok := args[i+1].(int)
+		if !ok {
+			continue
+		}
+		for j := 0; j < count; j++ {
+			messages = append(messages, message)
+		}
+	}
+	return messages
 }
 
 // RuleTestRunner runs each of the rule test cases. The rules are collectively

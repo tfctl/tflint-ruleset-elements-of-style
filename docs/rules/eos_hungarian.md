@@ -1,8 +1,8 @@
 # eos_hungarian
 
-Identify [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) in names. It is quite common to unnecessarily include the data type of a variable in it's name. Terraform is not a language that lends itself to that and the type is often times abstracted away.
+Identify [Hungarian notation](https://en.wikipedia.org/wiki/Hungarian_notation) in names. It is quite common to unnecessarily include the data type of a variable in its name. Terraform is not a language that lends itself to that and the type is often times abstracted away.
 
-## Examples
+## Example
 
 ```hcl
 variable "length_int" {

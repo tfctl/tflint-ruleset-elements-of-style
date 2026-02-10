@@ -20,7 +20,7 @@ func testCommentsBlockRule(t *testing.T) {
 			Name:    "eos_comments",
 			Content: testContent,
 			Want: []string{
-				AvoidBlockCommentsMessage,
+				avoidBlockCommentsMessage,
 			},
 		},
 	}

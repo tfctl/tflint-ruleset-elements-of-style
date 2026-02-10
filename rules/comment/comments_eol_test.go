@@ -19,13 +19,7 @@ func testCommentsEOLRule(t *testing.T) {
 		{
 			Name:    "eos_comments",
 			Content: testContent,
-			Want: []string{
-				avoidEOLCommentsMessage,
-				avoidEOLCommentsMessage,
-				avoidEOLCommentsMessage,
-				AvoidBlockCommentsMessage,
-				avoidEOLCommentsMessage,
-			},
+			Want:    testhelper.MakeMessageList(avoidBlockCommentsMessage, 1, avoidEOLCommentsMessage, 4),
 		},
 	}
 

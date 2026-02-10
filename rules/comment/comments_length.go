@@ -13,7 +13,7 @@ import (
 )
 
 // checkLength checks if comments exceed the column limit.
-func checkLength(r *CommentsRule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
+func checkLength(r *Rule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
 	if r.Config.Length.Column > 0 {
 		trimmedText := strings.TrimRight(text, "\r\n")
 		end := token.Range.Start.Column + len(trimmedText) - 1

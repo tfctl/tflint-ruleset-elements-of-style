@@ -13,7 +13,7 @@ const OnlyDynamicGuardMessage = "Avoid using count for anything other than dynam
 const GuardMustReturn10Message = "Count guard must return 1 or 0."
 
 // checkCountGuard checks for proper count guard usage.
-func checkCountGuard(runner tflint.Runner, r *MetaRule, attr *hclsyntax.Attribute) {
+func checkCountGuard(runner tflint.Runner, r *Rule, attr *hclsyntax.Attribute) {
 	expr := attr.Expr
 	condExpr, ok := expr.(*hclsyntax.ConditionalExpr)
 

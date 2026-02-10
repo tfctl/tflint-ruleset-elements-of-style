@@ -102,6 +102,35 @@ Repeating values can lead to maintenance issues. If a value needs to change, it 
 
 Duplicate blocks indicate copy-paste errors or missed refactoring opportunities.
 
+## How To Fix
+
+Extract repeated values into a `locals` block or variable, then reference them throughout your configuration.
+
+```hcl
+locals {
+  common_value = "some-value"
+  common_prefix = "prefix-${var.suffix}"
+}
+
+resource "terraform_data" "example" {
+  val1 = local.common_value
+  val2 = local.common_value
+
+  interp1 = local.common_prefix
+  interp2 = local.common_prefix
+}
+```
+
+The rule can be ignored with:
+
+```hcl
+resource "terraform_data" "example" {
+  # tflint-ignore: eos_dry
+  val1 = "intentionally-repeated"
+  val2 = "intentionally-repeated"
+}
+```
+
 ## Configuration
 
 This rule is enabled by default and can be disabled with:

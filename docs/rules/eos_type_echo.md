@@ -9,7 +9,7 @@ repeating parts of the block type in its name. Terraform is already a quite
 verbose language. Type echoing adds no value as the full type and name are
 *always* presented adjacent to each other.
 
-## Examples
+## Example
 
 ```hcl
 resource "aws_s3_bucket" "log_bucket" {
@@ -28,7 +28,7 @@ Warning: The type "aws_s3_bucket" is echoed in the label "log_bucket" (eos_type
 
 Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 
-Warning: The type "aws_secuirty_group" is echoed in the label "inbound_group" (eos_type_echo)
+Warning: The type "aws_security_group" is echoed in the label "inbound_group" (eos_type_echo)
 
   on main.tf line 1:
   1: resource "aws_security_group" "inbound_group" {
@@ -99,6 +99,18 @@ output "inbound_rule" {
 }
 ```
 
+## How To Fix
+
+Rename the resource block to remove the repetitive jitter. The rule can be
+ignored with:
+
+```hcl
+# tflint-ignore: eos_naming
+resource "terraform_data" "terraform_data_logging" {
+  # ...
+}
+```
+
 ## Configuration
 
 This check is enabled by default as part of `eos_naming` and can be disabled
@@ -123,17 +135,5 @@ rule "eos_naming" {
       group  = ["sg", "secgroup"]
     }
   }
-}
-```
-
-## How To Fix
-
-Rename the resource block to remove the repetitive jitter. The rule can be
-ignored with:
-
-```hcl
-# tflint-ignore: eos_naming
-resource "terraform_data" "terraform_data_logging" {
-  # ...
 }
 ```

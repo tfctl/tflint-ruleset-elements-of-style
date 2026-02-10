@@ -12,22 +12,33 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
+// OrderConfig defines which arguments must appear first and last in a block.
+type OrderConfig struct {
+	First []string `hclext:"first,optional" hcl:"first,optional"`
+	Last  []string `hclext:"last,optional" hcl:"last,optional"`
+}
+
 // metaConfig represents the configuration for the MetaRule.
 type metaConfig struct {
-	Enabled       *bool  `hclext:"enabled,optional" hcl:"enabled,optional"`
-	Level         string `hclext:"level,optional" hcl:"level,optional"`
-	SourceVersion *bool  `hcl:"source_version,optional"`
+	Enabled       *bool         `hclext:"enabled,optional" hcl:"enabled,optional"`
+	Level         string        `hclext:"level,optional" hcl:"level,optional"`
+	Order         []OrderConfig `hclext:"order,block" hcl:"order,block"`
+	SourceVersion *bool         `hcl:"source_version,optional"`
 }
 
 // defaultMetaConfig is the default configuration for the MetaRule.
 var defaultMetaConfig = metaConfig{
-	Enabled:       rulehelper.BoolPtr(true),
-	Level:         "warning",
+	Enabled: rulehelper.BoolPtr(true),
+	Level:   "warning",
+	Order: []OrderConfig{{
+		First: []string{"for_each", "count"},
+		Last:  []string{"depends_on", "provider", "lifecycle"},
+	}},
 	SourceVersion: rulehelper.BoolPtr(true),
 }
 
-// MetaRule checks for meta-argument style violations.
-type MetaRule struct {
+// Rule checks for meta-argument style violations.
+type Rule struct {
 	tflint.DefaultRule
 	Config metaConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -39,7 +50,7 @@ type MetaRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *MetaRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -59,6 +70,7 @@ func (r *MetaRule) Check(runner tflint.Runner) error {
 	for _, file := range files {
 		if body, ok := file.Body.(*hclsyntax.Body); ok {
 			for _, block := range body.Blocks {
+				checkOrder(runner, r, block)
 				if attr, exists := block.Body.Attributes["count"]; exists {
 					checkCountGuard(runner, r, attr)
 				}
@@ -72,31 +84,31 @@ func (r *MetaRule) Check(runner tflint.Runner) error {
 	return nil
 }
 
-func (r *MetaRule) emitIssue(runner tflint.Runner, message string, rng hcl.Range) {
+func (r *Rule) emitIssue(runner tflint.Runner, message string, rng hcl.Range) {
 	if err := runner.EmitIssue(r, message, rng); err != nil {
 		logger.Error(err.Error())
 	}
 }
 
 // NewMetaRule returns a new rule.
-func NewMetaRule() *MetaRule {
-	rule := &MetaRule{}
+func NewMetaRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultMetaConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *MetaRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule reference link.
-func (r *MetaRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_meta.md"
 }
 
 // Name returns the rule name.
-func (r *MetaRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -105,6 +117,6 @@ func (r *MetaRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *MetaRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

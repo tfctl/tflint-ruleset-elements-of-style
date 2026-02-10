@@ -22,7 +22,7 @@ var validHTTPSExtensions = []string{
 }
 
 // checkModuleSourceVersion checks for proper module source versioning.
-func checkModuleSourceVersion(runner tflint.Runner, r *MetaRule, block *hclsyntax.Block) {
+func checkModuleSourceVersion(runner tflint.Runner, r *Rule, block *hclsyntax.Block) {
 	sourceAttr, exists := block.Body.Attributes["source"]
 	if !exists {
 		return

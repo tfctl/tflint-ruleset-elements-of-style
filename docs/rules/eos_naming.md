@@ -82,6 +82,28 @@ consistency and compatibility.
 always displayed adjacent to each other. This leads to unnecessary verbosity
 like "s3 bucket log bucket".
 
+## How To Fix
+
+Rename the block to a shorter, more descriptive name, or use snake_case instead
+of all-uppercase or mixed case. The rule can be ignored with:
+
+```hcl
+# tflint-ignore: eos_naming
+resource "terraform_data" "very_long_instance_name" {
+  # ...
+}
+
+# tflint-ignore: eos_naming
+variable "MY_VAR" {
+  # ...
+}
+
+# tflint-ignore: eos_naming
+variable "CamelCase" {
+  # ...
+}
+```
+
 ## Configuration
 
 This rule is enabled by default and can be disabled with:
@@ -116,27 +138,5 @@ rule "eos_naming" {
       group  = ["sg", "secgroup"]
     }
   }
-}
-```
-
-## How To Fix
-
-Rename the block to a shorter, more descriptive name, or use snake_case instead
-of all-uppercase or mixed case. The rule can be ignored with:
-
-```hcl
-# tflint-ignore: eos_naming
-resource "terraform_data" "very_long_instance_name" {
-  # ...
-}
-
-# tflint-ignore: eos_naming
-variable "MY_VAR" {
-  # ...
-}
-
-# tflint-ignore: eos_naming
-variable "CamelCase" {
-  # ...
 }
 ```

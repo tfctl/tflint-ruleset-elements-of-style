@@ -36,8 +36,8 @@ var defaultHungarianConfig = hungarianConfig{
 	Level:   "warning",
 }
 
-// HungarianRule checks whether a block's type is echoed in its name.
-type HungarianRule struct {
+// Rule checks whether a block's type is echoed in its name.
+type Rule struct {
 	tflint.DefaultRule
 	Config hungarianConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -49,7 +49,7 @@ type HungarianRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *HungarianRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (r *HungarianRule) Check(runner tflint.Runner) error {
 }
 
 // checkForHungarian checks if the name uses Hungarian notation.
-func checkForHungarian(runner tflint.Runner, r *HungarianRule, defRange hcl.Range, typ string, name string, _ string) {
+func checkForHungarian(runner tflint.Runner, r *Rule, defRange hcl.Range, typ string, name string, _ string) {
 
 	// Combine the built-in defaults with extras defined in config.
 	tags := make([]string, 0, len(defaultHungarianTags)+len(r.Config.Tags))
@@ -84,24 +84,24 @@ func checkForHungarian(runner tflint.Runner, r *HungarianRule, defRange hcl.Rang
 }
 
 // NewHungarianRule returns a new rule.
-func NewHungarianRule() *HungarianRule {
-	rule := &HungarianRule{}
+func NewHungarianRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultHungarianConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *HungarianRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule reference link.
-func (r *HungarianRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md"
 }
 
 // Name returns the rule name.
-func (r *HungarianRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -110,6 +110,6 @@ func (r *HungarianRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *HungarianRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

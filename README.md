@@ -14,7 +14,6 @@ This TFLint ruleset checks for idiomatic conventions and styles for Terraform co
 |eos_meta|Problematic meta-argument syntax and values.|[Link](docs/rules/eos_meta.md)|
 |eos_naming|Awkward naming conventions.|[Link](docs/rules/eos_naming.md)|
 |eos_reminder|Use of reminder tags.|[Link](docs/rules/eos_reminder.md)|
-|eos_type_echo|Type echoing in resource names.|[Link](docs/rules/eos_type_echo.md)|
 
 ## Installation
 
@@ -59,6 +58,14 @@ plugin "elements-of-style" {
   enabled = true
 
   source  = "github.com/staranto/tflint-ruleset-elements-of-style"
-  version = "0.3.1" # replace as needed
+  version = "1.0.0" # replace as needed
 }
 ```
+
+## AI Acknowledgment
+
+This project uses AI-assisted tools (mostly GitHub CoPilot w/Claude Opus and Gemini 3) selectively:
+
+- **AI-assisted** — The test scaffolding, and much of the documentation were created with AI assistance and reviewed before inclusion.
+
+- **Routine refactoring** — AI tools assisted with lint corrections and minor optimizations.

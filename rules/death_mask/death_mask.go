@@ -30,8 +30,8 @@ var defaultDeathMaskConfig = deathMaskConfig{
 	Level:   "warning",
 }
 
-// DeathMaskRule checks for commented-out code.
-type DeathMaskRule struct {
+// Rule checks for commented-out code.
+type Rule struct {
 	tflint.DefaultRule
 	Config deathMaskConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -43,7 +43,7 @@ type DeathMaskRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *DeathMaskRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -70,7 +70,7 @@ func (r *DeathMaskRule) Check(runner tflint.Runner) error {
 }
 
 // checkDeathMask checks for commented-out code in a file.
-func (r *DeathMaskRule) checkDeathMask(runner tflint.Runner, filename string, file *hcl.File) error {
+func (r *Rule) checkDeathMask(runner tflint.Runner, filename string, file *hcl.File) error {
 	tokens, diags := hclsyntax.LexConfig(file.Bytes, filename, hcl.InitialPos)
 	if diags.HasErrors() {
 		return diags
@@ -114,7 +114,7 @@ func (r *DeathMaskRule) checkDeathMask(runner tflint.Runner, filename string, fi
 }
 
 // processCommentBlock unwraps and validates a block of comments.
-func (r *DeathMaskRule) processCommentBlock(runner tflint.Runner, tokens []hclsyntax.Token) {
+func (r *Rule) processCommentBlock(runner tflint.Runner, tokens []hclsyntax.Token) {
 	var lines []string
 	for _, token := range tokens {
 		text := string(token.Bytes)
@@ -172,24 +172,24 @@ func (r *DeathMaskRule) processCommentBlock(runner tflint.Runner, tokens []hclsy
 }
 
 // NewDeathMaskRule returns a new rule whose config is set to the default.
-func NewDeathMaskRule() *DeathMaskRule {
-	rule := &DeathMaskRule{}
+func NewDeathMaskRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultDeathMaskConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *DeathMaskRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule reference link.
-func (r *DeathMaskRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_death_mask.md"
 }
 
 // Name returns the rule name.
-func (r *DeathMaskRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -197,6 +197,6 @@ func (r *DeathMaskRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *DeathMaskRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

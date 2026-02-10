@@ -33,8 +33,8 @@ var defaultReminderConfig = reminderConfig{
 	Level:   "warning",
 }
 
-// ReminderRule checks for reminders.
-type ReminderRule struct {
+// Rule checks for reminders.
+type Rule struct {
 	tflint.DefaultRule
 	Config reminderConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -46,7 +46,7 @@ type ReminderRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (r *ReminderRule) Check(runner tflint.Runner) error {
+func (r *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(r.Name(), &r.Config, r.ConfigFile); err != nil {
 		return err
@@ -61,7 +61,7 @@ func (r *ReminderRule) Check(runner tflint.Runner) error {
 	return rulehelper.WalkTokens(runner, r, checkReminder)
 }
 
-func checkReminder(runner tflint.Runner, r *ReminderRule, token hclsyntax.Token) {
+func checkReminder(runner tflint.Runner, r *Rule, token hclsyntax.Token) {
 	if token.Type != hclsyntax.TokenComment {
 		return
 	}
@@ -91,24 +91,24 @@ func checkReminder(runner tflint.Runner, r *ReminderRule, token hclsyntax.Token)
 }
 
 // NewReminderRule returns a new rule.
-func NewReminderRule() *ReminderRule {
-	rule := &ReminderRule{}
+func NewReminderRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultReminderConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (r *ReminderRule) Enabled() bool {
+func (r *Rule) Enabled() bool {
 	return r.Config.Enabled == nil || *r.Config.Enabled
 }
 
 // Link returns the rule reference link.
-func (r *ReminderRule) Link() string {
+func (r *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_reminder.md"
 }
 
 // Name returns the rule name.
-func (r *ReminderRule) Name() string {
+func (r *Rule) Name() string {
 	if r.RuleName != "" {
 		return r.RuleName
 	}
@@ -116,6 +116,6 @@ func (r *ReminderRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (r *ReminderRule) Severity() tflint.Severity {
+func (r *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(r.Config.Level)
 }

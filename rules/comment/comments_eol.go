@@ -12,7 +12,7 @@ import (
 const avoidEOLCommentsMessage = "Avoid EOL comments."
 
 // checkEOL checks if EOL comments are used.
-func checkEOL(r *CommentsRule, _ string, runner tflint.Runner, token hclsyntax.Token, prevToken *hclsyntax.Token) {
+func checkEOL(r *Rule, _ string, runner tflint.Runner, token hclsyntax.Token, prevToken *hclsyntax.Token) {
 	if !r.Config.EOL {
 		return
 	}

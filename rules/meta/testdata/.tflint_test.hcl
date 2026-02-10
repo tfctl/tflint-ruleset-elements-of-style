@@ -9,6 +9,14 @@ rule "eos_meta_disabled" {
   enabled = false
 }
 
+rule "eos_meta_order" {
+  enabled = true
+  order {
+    first = ["zal"]
+    last  = ["kpx"]
+  }
+}
+
 rule "eos_meta_source_version_disabled" {
   source_version = false
 }

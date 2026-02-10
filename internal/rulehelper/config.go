@@ -25,7 +25,7 @@ func FindConfigFile() (string, error) {
 	}
 	cwdConfig := filepath.Join(cwd, ".tflint.hcl")
 	searched = append(searched, cwdConfig)
-	if _, err := os.Stat(cwdConfig); err == nil {
+	if _, err2 := os.Stat(cwdConfig); err2 == nil {
 		return cwdConfig, nil
 	}
 

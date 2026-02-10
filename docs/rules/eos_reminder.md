@@ -28,6 +28,26 @@ Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/mai
 
 Reminders (TODOs, FIXMEs, etc.) in code often get ignored and accumulate over time. It is generally better to track these tasks in an issue tracker where they can be prioritized and assigned. Keeping the codebase clean of these tags ensures that technical debt is visible and managed properly.
 
+## How To Fix
+
+Address the reminder and remove the comment, or move the task to an issue tracker.
+
+```hcl
+resource "terraform_data" "foo" {
+  # ...
+}
+```
+
+The rule can be ignored with:
+
+```hcl
+# tflint-ignore: eos_reminder
+# TODO: Fix this later
+resource "terraform_data" "foo" {
+  # ...
+}
+```
+
 ## Configuration
 
 This rule is enabled by default and can be disabled with:
@@ -46,25 +66,5 @@ rule "eos_reminder" {
   tags   = ["FIXME", "HACK"]        # Replace default tags
   extras = ["NOTGOOD", "REALBAD"]   # Add additional tags
   level  = "error"                  # Change severity to error
-}
-```
-
-## How To Fix
-
-Address the reminder and remove the comment, or move the task to an issue tracker.
-
-```hcl
-resource "terraform_data" "foo" {
-  # ...
-}
-```
-
-The rule can be ignored with:
-
-```hcl
-# tflint-ignore: eos_reminder
-# TODO: Fix this later
-resource "terraform_data" "foo" {
-  # ...
 }
 ```

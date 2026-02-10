@@ -57,17 +57,10 @@ func testHeredocRule(t *testing.T) {
 				content, _ := os.ReadFile("./testdata/heredoc_test.tf")
 				return string(content)
 			}(),
-			Want: []string{
-				AvoidStandardHeredocMessage,
-				AvoidEOFHeredocMessage,
-				AvoidStandardHeredocMessage,
-				AvoidEOFHeredocMessage,
-				AvoidEOFHeredocMessage,
-				AvoidEOFHeredocMessage,
-				AvoidStandardHeredocMessage,
-				AvoidEOFHeredocMessage,
-				AvoidEOFHeredocMessage,
-			},
+			Want: testhelper.MakeMessageList(
+				AvoidEOFHeredocMessage, 6,
+				AvoidStandardHeredocMessage, 3,
+			),
 		},
 	}
 

@@ -14,7 +14,7 @@ import (
 
 // checkTypeEcho checks if a word in type is echoed in the name.
 func checkTypeEcho(runner tflint.Runner,
-	rule *NamingRule, defRange hcl.Range,
+	rule *Rule, defRange hcl.Range,
 	typ string, name string, synonym string) {
 
 	// Assume there is no echo.

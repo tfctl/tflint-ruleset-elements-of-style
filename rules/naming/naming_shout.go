@@ -13,7 +13,7 @@ import (
 )
 
 // checkShout checks if the name is all uppercase.
-func checkShout(runner tflint.Runner, r *NamingRule, defRange hcl.Range, _ string, name string, _ string) {
+func checkShout(runner tflint.Runner, r *Rule, defRange hcl.Range, _ string, name string, _ string) {
 	hasAlpha := false
 	allUpper := true
 

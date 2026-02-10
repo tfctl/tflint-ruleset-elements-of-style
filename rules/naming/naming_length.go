@@ -12,7 +12,7 @@ import (
 )
 
 // checkNameLength checks if the name is too long.
-func checkNameLength(runner tflint.Runner, r *NamingRule, defRange hcl.Range, _ string, name string, _ string) {
+func checkNameLength(runner tflint.Runner, r *Rule, defRange hcl.Range, _ string, name string, _ string) {
 	limit := defaultLimit
 	if r.Config.Length != nil {
 		limit = *r.Config.Length

@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
-
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
+
+	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
 )
 
 // defaultLimit is the default maximum length for names.
@@ -43,8 +43,8 @@ var defaultConfig = namingRuleConfig{
 	Length:  &defaultLength,
 }
 
-// NamingRule checks whether a block's name is excessively long.
-type NamingRule struct {
+// Rule checks whether a block's name is excessively long.
+type Rule struct {
 	tflint.DefaultRule
 	Config namingRuleConfig
 	// RuleName is the rule block name to load from the config file. If empty,
@@ -56,7 +56,7 @@ type NamingRule struct {
 }
 
 // Check checks whether the rule conditions are met.
-func (rule *NamingRule) Check(runner tflint.Runner) error {
+func (rule *Rule) Check(runner tflint.Runner) error {
 	// Load config using the rule name and optional config file path.
 	if err := rulehelper.LoadRuleConfig(rule.Name(), &rule.Config, rule.ConfigFile); err != nil {
 		return err
@@ -69,7 +69,7 @@ func (rule *NamingRule) Check(runner tflint.Runner) error {
 		return nil
 	}
 
-	var checks []func(tflint.Runner, *NamingRule, hcl.Range, string, string, string)
+	var checks []func(tflint.Runner, *Rule, hcl.Range, string, string, string)
 	length := defaultLimit
 	if rule.Config.Length != nil {
 		length = *rule.Config.Length
@@ -95,24 +95,24 @@ func (rule *NamingRule) Check(runner tflint.Runner) error {
 }
 
 // NewNamingRule returns a new rule.
-func NewNamingRule() *NamingRule {
-	rule := &NamingRule{}
+func NewNamingRule() *Rule {
+	rule := &Rule{}
 	rule.Config = defaultConfig
 	return rule
 }
 
 // Enabled returns whether the rule is enabled by default.
-func (rule *NamingRule) Enabled() bool {
+func (rule *Rule) Enabled() bool {
 	return rule.Config.Enabled == nil || *rule.Config.Enabled
 }
 
 // Link returns the rule reference link.
-func (rule *NamingRule) Link() string {
+func (rule *Rule) Link() string {
 	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md"
 }
 
 // Name returns the rule name.
-func (rule *NamingRule) Name() string {
+func (rule *Rule) Name() string {
 	if rule.RuleName != "" {
 		return rule.RuleName
 	}
@@ -120,6 +120,6 @@ func (rule *NamingRule) Name() string {
 }
 
 // Severity returns the rule severity.
-func (rule *NamingRule) Severity() tflint.Severity {
+func (rule *Rule) Severity() tflint.Severity {
 	return rulehelper.ToSeverity(rule.Config.Level)
 }

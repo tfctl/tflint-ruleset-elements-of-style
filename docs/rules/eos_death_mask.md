@@ -28,6 +28,25 @@ Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/mai
 
 Commented-out code creates confusion and clutter. It is often unclear why the code was commented out, whether it is still relevant, or if it should be deleted. Version control systems (like Git) are the appropriate place to store history of deleted code.
 
+## How To Fix
+
+Delete the commented-out code. If you need to preserve it for reference, commit it to version control before removing it.
+
+```hcl
+resource "terraform_data" "example" {
+  name = "example"
+}
+```
+
+The rule can be ignored with:
+
+```hcl
+# tflint-ignore: eos_death_mask
+# resource "terraform_data" "example" {
+#   name = "example"
+# }
+```
+
 ## Configuration
 
 This rule is enabled by default and can be disabled with:

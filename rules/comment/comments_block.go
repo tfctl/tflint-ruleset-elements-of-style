@@ -11,13 +11,13 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-const AvoidBlockCommentsMessage = "Avoid block comments."
+const avoidBlockCommentsMessage = "Avoid block comments."
 
 // checkBlock checks if block comments are used.
-func checkBlock(r *CommentsRule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
+func checkBlock(r *Rule, text string, runner tflint.Runner, token hclsyntax.Token, _ *hclsyntax.Token) {
 	if r.Config.Block {
 		if strings.HasPrefix(text, "/*") {
-			message := AvoidBlockCommentsMessage
+			message := avoidBlockCommentsMessage
 			if err := runner.EmitIssue(r, message, token.Range); err != nil {
 				logger.Error(err.Error())
 			}

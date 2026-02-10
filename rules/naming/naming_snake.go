@@ -13,7 +13,7 @@ import (
 )
 
 // checkSnake checks if the name consists only of lowercase alphanumeric and underscores.
-func checkSnake(runner tflint.Runner, rule *NamingRule, defRange hcl.Range, _ string, name string, _ string) {
+func checkSnake(runner tflint.Runner, rule *Rule, defRange hcl.Range, _ string, name string, _ string) {
 	valid := true
 	for _, ch := range name {
 		if !(unicode.IsLower(ch) || unicode.IsDigit(ch) || ch == '_') {

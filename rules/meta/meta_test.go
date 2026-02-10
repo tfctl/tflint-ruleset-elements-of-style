@@ -21,6 +21,7 @@ func TestMeta(t *testing.T) {
 	t.Run("Config", testMetaConfig)
 
 	t.Run("CountGuard", testMetaCountGuardRule)
+	t.Run("Order", testMetaOrderRule)
 	t.Run("SourceVersion", testMetaSourceVersionRule)
 }
 
@@ -35,6 +36,18 @@ func testMetaConfig(t *testing.T) {
 			Want: func() metaConfig {
 				cfg := defaultMetaConfig
 				cfg.Enabled = rulehelper.BoolPtr(false)
+				return cfg
+			}(),
+		},
+		{
+			Name: "eos_meta_order",
+			Want: func() metaConfig {
+				cfg := defaultMetaConfig
+				cfg.Enabled = rulehelper.BoolPtr(true)
+				cfg.Order = []OrderConfig{{
+					First: []string{"zal"},
+					Last:  []string{"kpx"},
+				}}
 				return cfg
 			}(),
 		},
@@ -71,6 +84,22 @@ func testMetaCountGuardRule(t *testing.T) {
 
 	ruleFactory := func() tflint.Rule { return NewMetaRule() }
 	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "meta_count_guard_test.tf")
+}
+
+func testMetaOrderRule(t *testing.T) {
+	cases := []testhelper.RuleTestCase{
+		{
+			Name: "eos_meta",
+			Content: func() string {
+				content, _ := os.ReadFile("./testdata/meta_order_test.tf")
+				return string(content)
+			}(),
+			Want: testhelper.MakeMessageList(MisOrderedMessage, 3),
+		},
+	}
+
+	ruleFactory := func() tflint.Rule { return NewMetaRule() }
+	testhelper.RuleTestRunner(t, ruleFactory, "testdata/.tflint_test.hcl", cases, "meta_order_test.tf")
 }
 
 func testMetaSourceVersionRule(t *testing.T) {
