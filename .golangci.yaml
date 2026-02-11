@@ -45,7 +45,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/staranto/tflint-ruleset-elements-of-style
+        - github.com/tfctl/tflint-ruleset-elements-of-style
   exclusions:
     generated: lax
     paths:

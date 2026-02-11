@@ -8,8 +8,8 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/testhelper"
 )
 
 func TestComments(t *testing.T) {

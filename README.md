@@ -19,7 +19,7 @@ This TFLint ruleset checks for idiomatic conventions and styles for Terraform co
 
 ### Pre-built binary
 
-1. Download the zip file for your platform from the [Releases](https://github.com/staranto/tflint-ruleset-elements-of-style/releases/latest) page.
+1. Download the zip file for your platform from the [Releases](https://github.com/tfctl/tflint-ruleset-elements-of-style/releases/latest) page.
 
 2. Unzip it to your `${HOME}/.tflint.d/plugins` folder.
 
@@ -30,7 +30,7 @@ Building from source requires Go 1.25+.
 1. Clone the repository locally:
 
 ```
-$ git clone https://github.com/staranto/tflint-ruleset-elements-of-style.git
+$ git clone https://github.com/tfctl/tflint-ruleset-elements-of-style.git
 $ cd tflint-ruleset-elements-of-style
 ```
 
@@ -57,7 +57,7 @@ The plugin can be enabled with `tflint --init` after declaring the plugin in `.t
 plugin "elements-of-style" {
   enabled = true
 
-  source  = "github.com/staranto/tflint-ruleset-elements-of-style"
+  source  = "github.com/tfctl/tflint-ruleset-elements-of-style"
   version = "1.0.0" # replace as needed
 }
 ```

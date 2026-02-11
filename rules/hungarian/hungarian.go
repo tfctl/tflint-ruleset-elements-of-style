@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
@@ -97,7 +97,7 @@ func (r *Rule) Enabled() bool {
 
 // Link returns the rule reference link.
 func (r *Rule) Link() string {
-	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md"
+	return "https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md"
 }
 
 // Name returns the rule name.

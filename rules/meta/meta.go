@@ -4,7 +4,7 @@
 package meta
 
 import (
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -104,7 +104,7 @@ func (r *Rule) Enabled() bool {
 
 // Link returns the rule reference link.
 func (r *Rule) Link() string {
-	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_meta.md"
+	return "https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_meta.md"
 }
 
 // Name returns the rule name.

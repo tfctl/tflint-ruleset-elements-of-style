@@ -57,7 +57,7 @@ Warning: Avoid echoing type "aws_s3_bucket" in label "log_bucket". (eos_naming)
   on config.tf line 13:
   13: resource "aws_s3_bucket" "log_bucket" {
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md
 ```
 
 ## Why

@@ -21,14 +21,14 @@ Warning: 'length_int' uses Hungarian notation with 'int' (eos_hungarian)
   on main.tf line 1:
   1: variable "length_int" {
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
 
 Warning: 'str_username' uses Hungarian notation with 'str' (eos_hungarian)
 
   on main.tf line 6:
   6: str_username = "ubuntu"
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_hungarian.md
 ```
 
 ## Why

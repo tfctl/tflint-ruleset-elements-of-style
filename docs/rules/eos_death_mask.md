@@ -21,7 +21,7 @@ Warning: Avoid commented-out code. (eos_death_mask)
    2: #   name = "example"
    3: # }
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_death_mask.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_death_mask.md
 ```
 
 ## Why

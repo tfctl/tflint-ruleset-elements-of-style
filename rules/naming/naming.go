@@ -10,7 +10,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
 )
 
 // defaultLimit is the default maximum length for names.
@@ -108,7 +108,7 @@ func (rule *Rule) Enabled() bool {
 
 // Link returns the rule reference link.
 func (rule *Rule) Link() string {
-	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md"
+	return "https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_naming.md"
 }
 
 // Name returns the rule name.

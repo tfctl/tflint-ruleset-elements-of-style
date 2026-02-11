@@ -1,20 +1,18 @@
 .PHONY: default build check clean install release test tflint
+
+INSTALL_DIR=${HOME}/.tflint.d/plugins
+OUT=/tmp/tflint-ruleset-elements-of-style
+
 default: build
 
 build:
-	go build
-
-clean-runs:
-	gh run list --limit 100 --json databaseId,createdAt | \
-		jq -r '.[] | select((.createdAt | fromdateiso8601) < (now - 3 * 24 * 60 * 60)) | .databaseId' | \
-		xargs -n1 gh run delete
+	go build -o $(OUT)
 
 check:
 	tools/check.sh --all
 
-install: build
-	mkdir -p ~/.tflint.d/plugins
-	mv ./tflint-ruleset-elements-of-style ~/.tflint.d/plugins
+clean:
+	tools/clean.sh 30
 
 release:
 	@if [ -z "$(VERSION)" ]; then echo "Usage: make release VERSION=x.y.z"; exit 1; fi
@@ -33,7 +31,7 @@ release:
 test: build
 	go test ./... --count 1 -v
 
-tflint: install
+tflint:
 	for d in rules/*/testdata; do tflint --chdir $$d; done
 
 

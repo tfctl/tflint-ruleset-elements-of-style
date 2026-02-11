@@ -60,7 +60,7 @@ Warning: EOL comments not allowed. (eos_comments)
   on main.tf line 11:
    11:   ami = var.ami # EOL comment
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_comments.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_comments.md
 ```
 
 ## Why

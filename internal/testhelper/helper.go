@@ -14,7 +14,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/helper"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
 )
 
 // TestConfigFile is the standard path to the test config file relative to each

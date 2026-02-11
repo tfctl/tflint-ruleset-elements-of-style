@@ -47,7 +47,7 @@ Warning: 'EOF' is used as a heredoc delimiter. (eos_heredoc)
   on main.tf line 10:
    10:   user_data = <<EOF
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_heredoc.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_heredoc.md
 ```
 
 ## Why

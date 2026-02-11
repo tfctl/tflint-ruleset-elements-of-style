@@ -1,4 +1,4 @@
-module github.com/staranto/tflint-ruleset-elements-of-style
+module github.com/tfctl/tflint-ruleset-elements-of-style
 
 go 1.25.3
 
@@ -35,5 +35,3 @@ require (
 	google.golang.org/grpc v1.75.1 // indirect
 	google.golang.org/protobuf v1.36.9 // indirect
 )
-
-replace github.com/staranto/tflint-ruleset-terraform => /home/staranto/dev/tflint-ruleset-terraform

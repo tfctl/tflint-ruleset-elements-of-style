@@ -6,14 +6,14 @@ package main
 import (
 	"log"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/comment"
-	deathmask "github.com/staranto/tflint-ruleset-elements-of-style/rules/death_mask"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/dry"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/heredoc"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/hungarian"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/meta"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/naming"
-	"github.com/staranto/tflint-ruleset-elements-of-style/rules/reminder"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/comment"
+	deathmask "github.com/tfctl/tflint-ruleset-elements-of-style/rules/death_mask"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/dry"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/heredoc"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/hungarian"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/meta"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/naming"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/rules/reminder"
 
 	"github.com/terraform-linters/tflint-plugin-sdk/plugin"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"

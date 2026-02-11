@@ -20,7 +20,7 @@ Warning: '# TODO: Fix this later' has reminder tag. (eos_reminder)
   on config.tf line 1:
   1: # TODO: Fix this later
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_reminder.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_reminder.md
 
 ```
 

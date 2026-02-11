@@ -26,14 +26,14 @@ Warning: The type "aws_s3_bucket" is echoed in the label "log_bucket" (eos_type
   on main.tf line 1:
   1: resource "aws_s3_bucket" "log_bucket" {
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 
 Warning: The type "aws_security_group" is echoed in the label "inbound_group" (eos_type_echo)
 
   on main.tf line 1:
   1: resource "aws_security_group" "inbound_group" {
 
-Reference: https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
+Reference: https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_type_echo.md
 ```
 
 ## Why

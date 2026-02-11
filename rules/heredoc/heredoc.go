@@ -6,7 +6,7 @@ package heredoc
 import (
 	"regexp"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/rulehelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/rulehelper"
 
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
@@ -101,7 +101,7 @@ func (r *Rule) Enabled() bool {
 
 // Link returns the rule link.
 func (r *Rule) Link() string {
-	return "https://github.com/staranto/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_heredoc.md"
+	return "https://github.com/tfctl/tflint-ruleset-elements-of-style/blob/main/docs/rules/eos_heredoc.md"
 }
 
 // Name returns the rule name.

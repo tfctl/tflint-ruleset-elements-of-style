@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/staranto/tflint-ruleset-elements-of-style/internal/testhelper"
+	"github.com/tfctl/tflint-ruleset-elements-of-style/internal/testhelper"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
