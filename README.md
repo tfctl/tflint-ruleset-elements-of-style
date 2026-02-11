@@ -58,7 +58,7 @@ plugin "elements-of-style" {
   enabled = true
 
   source  = "github.com/tfctl/tflint-ruleset-elements-of-style"
-  version = "1.0.0" # replace as needed
+  version = "1.0.1" # replace as needed
 }
 ```
 
